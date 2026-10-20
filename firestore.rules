@@ -1,9 +1,81 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Solo la cuenta general de la aplicación (sesión iniciada en la tablet) lee y escribe.
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+
+    // Solo la cuenta general de la aplicación (la que inicia sesión en cada tablet).
+    // Cualquier otra cuenta queda fuera, aunque logre registrarse en Authentication.
+    function esApp() {
+      return request.auth != null
+        && request.auth.token.email == 'ccdbcomunicaciones@gmail.com'
+        && request.auth.token.firebase.sign_in_provider == 'password';
     }
+
+    function textoNoVacio(v) {
+      return v is string && v.trim().size() > 0;
+    }
+
+    function esFecha(v) {
+      return v is string && v.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+    }
+
+    function soloCampos(obligatorios) {
+      return request.resource.data.keys().hasAll(obligatorios)
+        && request.resource.data.keys().hasOnly(obligatorios);
+    }
+
+    // Datos obligatorios de un niño (ver docs/roles-y-permisos.md, registro de niños).
+    function ninoValido() {
+      let d = request.resource.data;
+      return textoNoVacio(d.nombres)
+        && textoNoVacio(d.primerApellido)
+        && esFecha(d.fechaIngreso)
+        && d.caja is number && d.caja > 0
+        && d.activo is bool
+        && d.marcas is map;
+    }
+
+    function usuarioValido() {
+      let d = request.resource.data;
+      return textoNoVacio(d.nombre)
+        && d.cargo in ['psicologia', 'trabajo_social', 'nutricion', 'pedagogia', 'coordinacion', 'gestion_caso']
+        && d.pin is string && d.pin.matches('^[0-9]{4}$')
+        && d.email is string
+        && d.activo is bool;
+    }
+
+    // Niños y usuarios: se crean y se editan, nunca se borran (egreso y baja solo los desactivan).
+    match /ninos/{id} {
+      allow read: if esApp();
+      allow create, update: if esApp() && ninoValido();
+    }
+
+    match /usuarios/{id} {
+      allow read: if esApp();
+      allow create, update: if esApp() && usuarioValido();
+    }
+
+    // Registros: solo se agregan entradas; no se editan ni se borran.
+    match /movimientos/{id} {
+      allow read: if esApp();
+      allow create: if esApp()
+        && soloCampos(['ninoId', 'tipo', 'por', 'en'])
+        && request.resource.data.tipo in ['retiro', 'devolucion'];
+    }
+
+    match /revisiones/{id} {
+      allow read: if esApp();
+      allow create: if esApp()
+        && soloCampos(['texto', 'por', 'en'])
+        && textoNoVacio(request.resource.data.texto);
+    }
+
+    match /historial/{id} {
+      allow read: if esApp();
+      allow create: if esApp()
+        && soloCampos(['ninoId', 'itemId', 'accion', 'por', 'en'])
+        && request.resource.data.accion in ['marcar', 'desmarcar'];
+    }
+
+    // Cualquier otra colección queda cerrada.
   }
 }
