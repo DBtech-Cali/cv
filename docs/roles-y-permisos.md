@@ -35,8 +35,10 @@ Complementa [`reglas-atencion.md`](reglas-atencion.md) y
 | Rol | Personas | Puede |
 |---|---|---|
 | Profesional | Psicóloga, Trabajadora social, Nutricionista, Pedagogo (uno por cargo) | Marcar y desmarcar **cualquier ítem de cualquier pestaña**; registrar comodines, fechas y traslado; marcar caso especial de Nutrición y sus frecuencias; asumir el nivel de riesgo |
-| Administrador | Coordinador, Gestor de caso (mismos permisos) | Todo lo del profesional, más: registrar niños nuevos, corregir la fecha de ingreso, egresos y bajas, crear y dar de baja usuarios, reportes, revisión |
+| Administrador | Coordinador, Gestor de caso, Soporte (mismos permisos) | Todo lo del profesional, más: registrar niños nuevos, corregir la fecha de ingreso, egresos y bajas, crear y dar de baja usuarios, reportes, revisión |
 
+- **Soporte:** persona de apoyo técnico que no pertenece oficialmente a la modalidad.
+  Tiene los mismos permisos de administración que el coordinador y el gestor de caso.
 - **Responsable del nivel de riesgo:** lo marca la psicóloga o la trabajadora social
   que lo va a llevar.
 

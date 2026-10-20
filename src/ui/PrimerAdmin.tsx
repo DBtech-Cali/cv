@@ -33,6 +33,7 @@ export function PrimerAdmin() {
           <select value={cargo} onChange={(e) => setCargo(e.target.value as Cargo)}>
             <option value="coordinacion">{CARGOS.coordinacion}</option>
             <option value="gestion_caso">{CARGOS.gestion_caso}</option>
+            <option value="soporte">{CARGOS.soporte}</option>
           </select>
         </label>
         <label className="campo" style={{ width: '100%', textAlign: 'left' }}>Correo Gmail (opcional · solo para el correo de los lunes)<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></label>

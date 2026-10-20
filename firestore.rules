@@ -37,7 +37,7 @@ service cloud.firestore {
     function usuarioValido() {
       let d = request.resource.data;
       return textoNoVacio(d.nombre)
-        && d.cargo in ['psicologia', 'trabajo_social', 'nutricion', 'pedagogia', 'coordinacion', 'gestion_caso']
+        && d.cargo in ['psicologia', 'trabajo_social', 'nutricion', 'pedagogia', 'coordinacion', 'gestion_caso', 'soporte']
         && d.pin is string && d.pin.matches('^[0-9]{4}$')
         && d.email is string
         && d.activo is bool;

@@ -1,7 +1,7 @@
 import type { FrecuenciaNutricion } from './calendario';
 import type { Fecha } from './fechas';
 
-export type Cargo = 'psicologia' | 'trabajo_social' | 'nutricion' | 'pedagogia' | 'coordinacion' | 'gestion_caso';
+export type Cargo = 'psicologia' | 'trabajo_social' | 'nutricion' | 'pedagogia' | 'coordinacion' | 'gestion_caso' | 'soporte';
 export type Responsable = 'psicologia' | 'trabajo_social' | 'nutricion' | 'pedagogia' | 'general';
 
 export const CARGOS: Record<Cargo, string> = {
@@ -11,6 +11,7 @@ export const CARGOS: Record<Cargo, string> = {
   pedagogia: 'Pedagogo',
   coordinacion: 'Coordinador',
   gestion_caso: 'Gestor de caso',
+  soporte: 'Soporte',
 };
 
 export const RESPONSABLES: Record<Responsable, string> = {
@@ -30,7 +31,8 @@ export interface Usuario {
   activo: boolean;
 }
 
-export const esAdmin = (u: Usuario | null | undefined) => !!u && (u.cargo === 'coordinacion' || u.cargo === 'gestion_caso');
+/** Coordinación, gestión de caso y soporte tienen los mismos permisos de administración. */
+export const esAdmin = (u: Usuario | null | undefined) => !!u && (u.cargo === 'coordinacion' || u.cargo === 'gestion_caso' || u.cargo === 'soporte');
 
 /** Un ítem marcado. Si no hay marca, el ítem no está marcado. */
 export interface Marca {

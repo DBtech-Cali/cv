@@ -22,7 +22,8 @@ npm run build      # versión para publicar (carpeta dist/)
 
 Sin configuración de Firebase la app arranca en **modo demostración**: datos de
 ejemplo guardados solo en el navegador. PIN de prueba: 1111 Psicóloga, 2222 Trabajo
-social, 3333 Nutrición, 4444 Pedagogo, 9999 Coordinador, 8888 Gestor de caso.
+social, 3333 Nutrición, 4444 Pedagogo, 9999 Coordinador, 8888 Gestor de caso,
+7777 Soporte.
 
 ## Código
 

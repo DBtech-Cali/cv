@@ -5,7 +5,7 @@ import type { Marca, Nino, Usuario } from '../dominio/modelo';
 import { ahoraISO, type Datos, type Repositorio } from './repositorio';
 
 // Cambia la clave cuando cambie la estructura de la carpeta, para no leer datos viejos.
-const CLAVE = 'casa-demo-v2';
+const CLAVE = 'casa-demo-v3';
 
 const USUARIOS: Usuario[] = [
   { id: 'u-psico', nombre: 'Psicóloga', cargo: 'psicologia', pin: '1111', email: '', activo: true },
@@ -14,6 +14,7 @@ const USUARIOS: Usuario[] = [
   { id: 'u-ped', nombre: 'Pedagogo', cargo: 'pedagogia', pin: '4444', email: '', activo: true },
   { id: 'u-coord', nombre: 'Coordinador', cargo: 'coordinacion', pin: '9999', email: '', activo: true },
   { id: 'u-gestor', nombre: 'Gestor de caso', cargo: 'gestion_caso', pin: '8888', email: '', activo: true },
+  { id: 'u-soporte', nombre: 'Soporte', cargo: 'soporte', pin: '7777', email: '', activo: true },
 ];
 
 /** Niños de ejemplo: días desde el ingreso y qué proporción de su carpeta está al día. */

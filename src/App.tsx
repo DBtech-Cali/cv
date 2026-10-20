@@ -44,7 +44,7 @@ export function App({ repo }: { repo: Repositorio }) {
   }, [repo, datos, hoy]);
 
   const entrar = useCallback((u: Usuario) => ambito && setSesion({ ambito, usuario: u }), [ambito]);
-  const soloAdmin = useCallback((u: Usuario) => (esAdmin(u) ? null : 'Solo coordinación o gestión de caso.'), []);
+  const soloAdmin = useCallback((u: Usuario) => (esAdmin(u) ? null : 'Solo coordinación, gestión de caso o soporte.'), []);
 
   if (!ctx) {
     return (
@@ -69,7 +69,7 @@ export function App({ repo }: { repo: Repositorio }) {
   } else if (ruta[0] === 'admin') {
     pantalla = sesion?.ambito === 'admin'
       ? <Admin seccion={ruta[1]} sesion={sesion.usuario} />
-      : <Pin contexto="Administración" titulo="Coordinación y gestión de caso" onOk={entrar} validar={soloAdmin} onCancelar={() => ir('/')} />;
+      : <Pin contexto="Administración" titulo="Coordinación, gestión de caso y soporte" onOk={entrar} validar={soloAdmin} onCancelar={() => ir('/')} />;
   } else {
     pantalla = <Lista />;
   }
@@ -78,7 +78,7 @@ export function App({ repo }: { repo: Repositorio }) {
     <Ctx.Provider value={ctx}>
       {repo.modo === 'demo' && (
         <div className="aviso-demo no-imprimir">
-          Modo demostración: los datos se guardan solo en este navegador. PIN de prueba: 1111 Psicóloga · 2222 TS · 3333 Nutrición · 4444 Pedagogo · 9999 Coordinador · 8888 Gestor de caso.{' '}
+          Modo demostración: los datos se guardan solo en este navegador. PIN de prueba: 1111 Psicóloga · 2222 TS · 3333 Nutrición · 4444 Pedagogo · 9999 Coordinador · 8888 Gestor de caso · 7777 Soporte.{' '}
           <button type="button" onClick={() => { reiniciarDemo(); window.location.reload(); }}>Reiniciar datos</button>
         </div>
       )}
