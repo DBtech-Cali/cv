@@ -1,6 +1,6 @@
-# Vista previa en GitHub Pages, en modo demostración (datos de ejemplo, sin Firebase).
+# Publica la app en GitHub Pages, conectada a Firebase (.env.production).
 # Se publica en la rama gh-pages cada vez que cambia la rama de trabajo.
-name: Vista previa
+name: Publicar
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: vista-previa
+  group: publicar
   cancel-in-progress: true
 
 jobs:
@@ -25,14 +25,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: npx tsc -b
-      # El modo "demo" no lee .env.production: la app arranca con datos de ejemplo.
-      - run: npx vite build --mode demo
+      # Compila en modo producción: lee .env.production y se conecta a Firebase.
+      - run: npm run build
       - name: Publicar en gh-pages
         run: |
           cd dist
           touch .nojekyll
           git init -q -b gh-pages
           git add -A
-          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -q -m "Vista previa de ${GITHUB_SHA::7}"
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -q -m "Publicación de ${GITHUB_SHA::7}"
           git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
