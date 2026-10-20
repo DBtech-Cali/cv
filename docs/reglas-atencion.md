@@ -67,7 +67,13 @@ Las dos áreas siguen el mismo calendario, cada una con su propio juego de atenc
   4. Seguimiento a la adaptación
   5. Gustos y preferencias
   6. Estado emocional
-- **Trabajo social** — sin nombre propio: Atención 1 a Atención 6.
+- **Trabajo social** — las tres primeras tienen nombre:
+  1. Llamada de contacto
+  2. Cambio de SIM card
+  3. Adaptación
+  4. Atención 4
+  5. Atención 5
+  6. Atención 6
 
 ### Desde el 1er seguimiento: 3 atenciones por bloque trimestral
 

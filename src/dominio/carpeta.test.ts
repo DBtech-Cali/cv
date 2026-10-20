@@ -81,9 +81,11 @@ describe('Psicología y Trabajo social', () => {
     expect(psico('2026-09-07').every((i) => !i.exigible && i.fechaOculta)).toBe(true);
     expect(psico('2026-09-08').every((i) => i.estado === 'vencido')).toBe(true);
   });
-  it('Trabajo social las numera y luego sigue el calendario por bloque', () => {
+  it('Trabajo social: tres con nombre, tres numeradas y luego el calendario por bloque', () => {
     const t = tab(nino({ 'ts.solicitud_llamada': m() }), '2026-10-08', 'trabajo_social');
-    expect(t.items.find((i) => i.id === 'ate.trabajo_social.1')?.etiqueta).toBe('Atención 1');
+    expect(t.items.filter((i) => /^ate\.trabajo_social\.[1-6]$/.test(i.id)).map((i) => i.etiqueta)).toEqual([
+      'Llamada de contacto', 'Cambio de SIM card', 'Adaptación', 'Atención 4', 'Atención 5', 'Atención 6',
+    ]);
     expect(t.items.find((i) => i.id === 'ate.trabajo_social.7')?.fecha).toBe('2026-10-07');
     // solicitud de llamada + 6 de ingreso + atención 7 (la hoja de llamada es opcional)
     expect(t.exigibles).toBe(8);

@@ -1,7 +1,7 @@
 // Evaluación de la carpeta: qué se exige hoy en cada pestaña y cuánto se cumple.
 // Ver docs/contenido-carpeta.md.
 import {
-  ATENCIONES_INGRESO_PSICOLOGIA, atencionesAcademico, atencionesNutricion, atencionesPorBloque, hito, informes,
+  ATENCIONES_INGRESO_PSICOLOGIA, ATENCIONES_INGRESO_TRABAJO_SOCIAL, atencionesAcademico, atencionesNutricion, atencionesPorBloque, hito, informes,
   nivelRiesgo, type Programada,
 } from './calendario';
 import { corta, type Fecha, partes, sumarDias, sumarMeses } from './fechas';
@@ -192,10 +192,8 @@ class Constructor {
 function atencionesConIngreso(c: Constructor, nino: Nino, hoy: Fecha, hasta: Fecha, area: 'psicologia' | 'trabajo_social') {
   const seg1 = hito(nino.fechaIngreso, 1);
   const nota = hoy > seg1 ? `Debía hacerse antes del 1er seguimiento (${corta(seg1, hoy)})` : `Hacer antes del 1er seguimiento (${corta(seg1, hoy)})`;
-  for (let i = 1; i <= 6; i++) {
-    const etiqueta = area === 'psicologia' ? ATENCIONES_INGRESO_PSICOLOGIA[i - 1] : `Atención ${i}`;
-    c.programada(`ate.${area}.${i}`, etiqueta, seg1, { sinFecha: nota });
-  }
+  const nombres = area === 'psicologia' ? ATENCIONES_INGRESO_PSICOLOGIA : ATENCIONES_INGRESO_TRABAJO_SOCIAL;
+  nombres.forEach((etiqueta, i) => c.programada(`ate.${area}.${i + 1}`, etiqueta, seg1, { sinFecha: nota }));
   c.calendario(`ate.${area}`, atencionesPorBloque(nino.fechaIngreso, hasta));
 }
 

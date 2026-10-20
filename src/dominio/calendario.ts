@@ -37,7 +37,16 @@ export function bloqueDe(ingreso: Fecha, f: Fecha): number {
   return k;
 }
 
-/** Atenciones de ingreso de Psicología, en orden. Las de Trabajo social no tienen nombre. */
+/** Atenciones de ingreso (antes del 1er seguimiento), en orden. */
+export const ATENCIONES_INGRESO_TRABAJO_SOCIAL = [
+  'Llamada de contacto',
+  'Cambio de SIM card',
+  'Adaptación',
+  'Atención 4',
+  'Atención 5',
+  'Atención 6',
+];
+
 export const ATENCIONES_INGRESO_PSICOLOGIA = [
   'Valoración de consumo',
   'Estado físico',
@@ -51,6 +60,7 @@ export const ATENCIONES_INGRESO_PSICOLOGIA = [
  * Trabajo social y Psicología desde el 1er seguimiento: 3 por bloque trimestral,
  * a 1 y 2 meses del seguimiento que lo abre y 5 días antes del siguiente.
  * Se numeran desde la 7 (las 6 primeras son las de ingreso, sin fecha).
+ * Un bloque que empieza antes de `hasta` se muestra completo, para no verlo a medias.
  */
 export function atencionesPorBloque(ingreso: Fecha, hasta: Fecha): Programada[] {
   const ancla = partes(planDeCaso(ingreso)).d;
@@ -60,7 +70,7 @@ export function atencionesPorBloque(ingreso: Fecha, hasta: Fecha): Programada[] 
     if (abre > hasta) break;
     const grupo = `Bloque ${k} · ${k}º → ${k + 1}º seguimiento`;
     for (const fecha of [sumarMeses(abre, 1, ancla), sumarMeses(abre, 2, ancla), sumarDias(hito(ingreso, k + 1), -5)]) {
-      if (fecha <= hasta) out.push({ id: String(n), fecha, etiqueta: `Atención ${n}`, grupo });
+      out.push({ id: String(n), fecha, etiqueta: `Atención ${n}`, grupo });
       n++;
     }
   }

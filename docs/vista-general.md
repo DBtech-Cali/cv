@@ -31,7 +31,9 @@ Siempre con el número visible además del color.
   - **barra de progreso** con el porcentaje general (promedio de pestañas);
   - **caja** (📦 6);
   - indicador de **carpeta fuera** (en rojo si lleva más de 7 días);
-  - **próximo vencimiento** (ej.: "Seguimiento en 3 días").
+  - **próximo vencimiento** (ej.: "Seguimiento en 3 días");
+  - botón **Retirar / Devolver** la carpeta física: pide el PIN de quien la retira o
+    la devuelve y lo registra con la fecha y la hora, sin abrir la carpeta.
 - **Buscador** por nombre.
 - **Filtros rápidos:** menos de 70 %, carpetas fuera, por caja.
 

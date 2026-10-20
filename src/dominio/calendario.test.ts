@@ -19,7 +19,7 @@ describe('ingreso 7 de mayo de 2026', () => {
     expect([1, 2, 3, 4].map((k) => hito(ing, k))).toEqual(['2026-09-07', '2026-12-07', '2027-03-07', '2027-06-07']);
   });
   it('Trabajo social y Psicología: 3 por bloque, la tercera 5 días antes del seguimiento siguiente', () => {
-    const xs = atencionesPorBloque(ing, '2027-06-30');
+    const xs = atencionesPorBloque(ing, '2027-06-06');
     expect(fechas(xs)).toEqual([
       '2026-10-07', '2026-11-07', '2026-12-02',
       '2027-01-07', '2027-02-07', '2027-03-02',
@@ -70,6 +70,9 @@ describe('ingreso 31 de enero de 2027', () => {
 
 describe('ingreso 30 de octubre de 2026', () => {
   const ing = '2026-10-30';
+  it('un bloque que ya empezó se muestra completo', () => {
+    expect(fechas(atencionesPorBloque('2026-05-07', '2026-09-07'))).toEqual(['2026-10-07', '2026-11-07', '2026-12-02']);
+  });
   it('el ancla vuelve después de febrero', () => {
     expect(planDeCaso(ing)).toBe('2026-11-30');
     expect([1, 2, 3].map((k) => hito(ing, k))).toEqual(['2027-02-28', '2027-05-30', '2027-08-30']);

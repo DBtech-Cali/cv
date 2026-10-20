@@ -125,7 +125,7 @@ Sin comodín.
 |---|---|
 | Responsable del nivel de riesgo | Selector: Trabajo social o Psicología |
 | Solicitud de llamada | Requerido, sin fecha |
-| Atenciones de Trabajo social | 6 sin fecha antes del 1er seguimiento, luego 3 por bloque (ver `reglas-atencion.md`) |
+| Atenciones de Trabajo social | 6 sin fecha antes del 1er seguimiento (llamada de contacto, cambio de SIM card, adaptación, atención 4, 5 y 6), luego 3 por bloque (ver `reglas-atencion.md`) |
 | Seguimientos de nivel de riesgo | Si Trabajo social es la responsable |
 | Formato hoja de llamada | Opcional (se deposita al final), no afecta el % |
 | Solicitudes de visita | Lista libre: fecha, persona y parentesco. No afecta el % |
