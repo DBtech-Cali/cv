@@ -40,7 +40,7 @@ Siempre con el número visible además del color.
 - Al tocar un niño se pide el **PIN** (ver `roles-y-permisos.md`). La sesión dura
   mientras se esté dentro de esa carpeta.
 - Encabezado: nombre, caja, porcentaje general, botón **retirar / devolver carpeta**.
-- **Cuadrícula de 12 tarjetas**, una por pestaña, cada una con ícono, nombre y su
+- **Cuadrícula de 9 tarjetas**, una por pestaña, cada una con ícono, nombre y su
   barra de progreso (como abrir la carpeta física).
 - Volver a la lista **cierra la sesión de PIN**.
 
@@ -48,10 +48,13 @@ Siempre con el número visible además del color.
 
 - Título de la pestaña con su **barra de progreso**.
 - **Casillas grandes**, cómodas para tocar en tablet.
-- Ítems con fecha (ADRES, tallaje, comodines, constancia de estudio): al marcarlos
+- Ítems con fecha (ADRES, peso y talla, comodines, matrícula): al marcarlos
   **se abre el selector de fecha** (o año).
-- Comodines muestran su vigencia: "Vence en 12 días".
-- Excepciones como casillas propias; la de crecimiento y desarrollo con campo de motivo.
+- Comodines muestran su vigencia: "Vence en 3 días".
+- Casillas que activan ítems: "Viene de traslado" (Socio legal) y "Caso especial"
+  (Nutrición, con sus dos frecuencias).
+- Listas libres (solicitudes de visita, vinculaciones, cursos) con su formulario para
+  agregar y quitar.
 - **Atenciones y seguimientos como línea de tiempo**: cumplidas en verde, vencidas en
   rojo, futuras en gris con su fecha.
 - Debajo de cada ítem marcado, en pequeño: "Marcado por Psicóloga · 14 oct".
@@ -66,11 +69,12 @@ Visible para **todos**. Responde a "¿qué toca hacer?".
 - **Debajo:** calendario con puntos por día + lista agrupada por día de los
   **próximos 30 días**.
 - **Eventos incluidos:**
-  - atenciones por área (TS, Psicología, Pedagogía, Nutrición en casos especiales);
+  - atenciones por área (Trabajo social, Psicología, Académico, Nutrición en casos
+    especiales). Las 6 atenciones sin fecha aparecen con el 1er seguimiento como límite;
   - plan de caso, seguimientos y sus correos de envío;
   - evaluación preliminar e integradora;
   - seguimientos de nivel de riesgo;
-  - **vencimientos de documentos:** ADRES, tallaje, cartas y comodines;
+  - **vencimientos de documentos:** ADRES, peso y talla y comodines;
   - carpetas fuera.
 - **Filtros:** por profesional (mismo reparto que los reportes) y por tipo.
 - Tocar un evento abre la carpeta del niño **en esa pestaña** (pide PIN).

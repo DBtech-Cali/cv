@@ -12,7 +12,6 @@ Toda la programación de fechas de la aplicación debe salir de estas reglas.
 - **Programado vs. cumplido.** La aplicación separa:
   - lo **programado**: fechas calculadas, inmóviles;
   - lo **cumplido**: si el documento de esa actividad ya está en la carpeta.
-  El detalle de estados (verde / rojo) se definirá más adelante.
 - **Exigible desde el día siguiente.** Toda actividad con fecha cuenta como faltante
   a partir del día siguiente a su fecha; el mismo día todavía se puede entregar.
 
@@ -20,9 +19,12 @@ Toda la programación de fechas de la aplicación debe salir de estas reglas.
 
 - **Plan de caso = fecha de ingreso + 1 mes calendario**, el mismo número de día.
 - Si el mes siguiente no tiene ese día, el plan de caso cae en el **último día del mes**.
-- **El día del plan de caso es el día ancla** de todos los hitos y atenciones mensuales.
+- **El día del plan de caso es el día ancla** de los seguimientos, del nivel de riesgo
+  y de las atenciones de Trabajo social y Psicología.
 - Cuando un mes no tiene el día ancla, **solo ese mes** usa su último día; el
   siguiente vuelve al día ancla.
+- Las atenciones de **Académico** y de **Nutrición** se cuentan desde el **día del
+  ingreso** (ver secciones 6 y 7), con la misma regla de fin de mes.
 
 Ejemplos:
 
@@ -37,113 +39,131 @@ Ejemplos:
 
 - **Seguimiento N = plan de caso + 3·N meses**, en el día ancla.
 - Se repiten cada 3 meses de forma indefinida, hasta el egreso.
+- El tramo entre dos seguimientos consecutivos es un **bloque trimestral**.
 
-## 4. Áreas
+## 4. Áreas con atenciones
 
-| Área | Obligatoria |
-|---|---|
-| Trabajo Social | Sí |
-| Psicología | Sí |
-| Pedagogía | Sí |
-| Nutrición | No — solo si se activa (ver sección 6) |
+| Área | Obligatoria | Regla |
+|---|---|---|
+| Trabajo social | Sí | Sección 5 |
+| Psicología | Sí | Sección 5 |
+| Académico (pedagogo) | Sí | Sección 6 |
+| Nutrición | No — solo si es caso especial | Sección 7 |
 
-Cada área tiene su propio juego de atenciones con las mismas fechas.
+## 5. Atenciones de Trabajo social y Psicología
 
-## 5. Atenciones de Trabajo Social, Psicología y Pedagogía
+Las dos áreas siguen el mismo calendario, cada una con su propio juego de atenciones.
 
-### Periodo 1 — plan de caso → 1er seguimiento: 5 atenciones por área
+### Ingreso → 1er seguimiento: 6 atenciones sin fecha
 
-Dos al mes, el día ancla y a mitad de mes (+15 días):
+- Son **6 atenciones sin fecha propia**: se pueden hacer en cualquier momento antes
+  del 1er seguimiento.
+- Aparecen desde el ingreso, pero **no cuentan como pendientes** hasta el **día
+  siguiente al 1er seguimiento**. Desde ese día, las que falten cuentan como vencidas.
+- **Psicología** — cada una tiene nombre:
+  1. Valoración de consumo
+  2. Estado físico
+  3. Adaptación
+  4. Seguimiento a la adaptación
+  5. Gustos y preferencias
+  6. Estado emocional
+- **Trabajo social** — sin nombre propio: Atención 1 a Atención 6.
 
-1. Plan de caso + 15 días
-2. Plan de caso + 1 mes
-3. Plan de caso + 1 mes + 15 días
-4. Plan de caso + 2 meses
-5. Plan de caso + 2 meses + 15 días
+### Desde el 1er seguimiento: 3 atenciones por bloque trimestral
 
-(La sexta coincidiría con el 1er seguimiento, por eso no existe.)
+Una atención mensual, en el día ancla. La tercera del bloque coincidiría con el
+seguimiento siguiente, por eso se adelanta **5 días**:
 
-### Periodo 2 — 1er seguimiento → 2º seguimiento: 3 atenciones por área
+1. Seguimiento que abre el bloque + 1 mes
+2. Seguimiento que abre el bloque + 2 meses
+3. Seguimiento siguiente − 5 días (fecha exacta)
 
-1. 1er seguimiento + 1 mes
-2. 1er seguimiento + 2 meses
-3. 2º seguimiento − 5 días (fecha exacta)
+Se repite en cada bloque, de forma indefinida, hasta el egreso.
 
-### Periodo 3 en adelante — entre seguimientos consecutivos: 1 atención por área
+## 6. Atenciones de Académico (pedagogo)
 
-- Seguimiento que abre el periodo + 45 días.
-- Es decir, 3 atenciones por trimestre (una por cada área).
+Mensuales, en el **día del ingreso** (con la regla de fin de mes):
 
-## 6. Nutrición
+- Si ingresa **del día 1 al 15** del mes: la 1ª atención es **ingreso + 15 días**.
+  Después, ingreso + 1 mes, + 2 meses, + 3 meses…
+- Si ingresa **del día 16 en adelante**: ese mes no tiene atención. La 1ª es
+  **ingreso + 1 mes**; después, + 2 meses, + 3 meses…
+
+Ejemplos: ingreso 7 may → 22 may, 7 jun, 7 jul, 7 ago… · ingreso 20 may → 20 jun,
+20 jul, 20 ago…
+
+## 7. Nutrición
 
 - Se activa **solo cuando el nutricionista incluye al niño o niña** por afectación
-  nutricional (exceso o déficit de peso).
-- Se activa marcando **"Caso especial"** en la pestaña Nutrición.
-- Sin importar cuándo se marque, se exige **1 atención por bloque trimestral desde el
-  plan de caso** (plan → 1er seguimiento, 1er → 2º, 2º → 3º, …), en la fecha
-  **hito que abre el bloque + 45 días**. Así, al pasar carpetas antiguas a la app
-  aparecen las atenciones que debieron hacerse.
-- **No usa** las reglas de 15 días ni mensuales de las otras áreas.
-- El nutricionista **puede desactivarla** cuando el niño recupera o estabiliza su peso.
-  Al desactivarla **deja de exigirse todo** lo de Nutrición (incluidas atenciones ya
-  vencidas) hasta que se vuelva a activar.
-  Mientras no esté activa, no genera atenciones pendientes ni vencidas.
+  nutricional (exceso o déficit de peso), marcando **"Caso especial"** en la pestaña
+  Nutrición.
+- Al activarla, la nutricionista elige **por separado**:
+  - **Frecuencia del peso y talla:** cada 1, 2 o 3 meses (es la vigencia del tallaje,
+    ver `contenido-carpeta.md`).
+  - **Frecuencia de las atenciones:**
 
-## 7. Seguimiento de nivel de riesgo
+    | Frecuencia | Fechas |
+    |---|---|
+    | 2 al mes | ingreso + 15 días, + 1 mes, + 1 mes y 15 días, + 2 meses… |
+    | 1 al mes | ingreso + 1 mes, + 2 meses, + 3 meses… |
+    | 1 al trimestre | ingreso + 3 meses, + 6 meses, + 9 meses… |
+
+- Las atenciones se cuentan **desde el día del ingreso**, sin importar cuándo se
+  marque el caso especial: al pasar carpetas antiguas a la app aparecen las atenciones
+  que debieron hacerse. Si se cambia la frecuencia, el calendario se calcula de nuevo
+  con la frecuencia nueva.
+- La nutricionista **puede desactivarla** cuando el niño recupera o estabiliza su peso.
+  Al desactivarla **deja de exigirse todo** lo del caso especial (incluidas atenciones
+  ya vencidas) hasta que se vuelva a activar.
+
+## 8. Seguimiento de nivel de riesgo
 
 - **Todos** los niños lo tienen.
 - **Mensual** desde el plan de caso, en el día ancla (misma regla de fin de mes):
   plan de caso + 1 mes, + 2 meses, + 3 meses… hasta el egreso.
   Ejemplo: plan 15 mar → 15 abr, 15 may, 15 jun, 15 jul…
-- **Responsable** asignada por niño: Trabajo Social **o** Psicología. Se registra en
+- **Responsable** asignada por niño: Trabajo social **o** Psicología. Se registra en
   la pestaña de la responsable. No cambia en el tiempo.
 
-## 8. Egreso
+## 9. Egreso
 
 - Al egresar, la carpeta física con todo su material se traslada a otro lugar.
 - En la aplicación el niño o niña **deja de verse** en el panel (solo se muestran los
   activos) y deja de generar fechas y pendientes.
 - Los datos **no se borran**: quedan guardados como histórico.
 
-## 9. Ejemplos completos
+## 10. Ejemplos completos
 
-### Ingreso 7 de mayo de 2026 (Nutrición como caso especial)
+### Ingreso 7 de mayo de 2026
 
-| Hito / bloque | TS / Psicología / Pedagogía (c/u) | Nutrición |
+| Hito / bloque | Trabajo social y Psicología (c/u) | Académico |
 |---|---|---|
-| **Plan de caso** — 7 jun 2026 | | |
-| Periodo 1 | 22 jun · 7 jul · 22 jul · 7 ago · 22 ago | 22 jul |
-| **1er seguimiento** — 7 sep 2026 | | |
-| Periodo 2 | 7 oct · 7 nov · 2 dic | 22 oct |
-| **2º seguimiento** — 7 dic 2026 | | |
-| Periodo 3 | 21 ene 2027 | 21 ene 2027 |
-| **3er seguimiento** — 7 mar 2027 | | |
-| Periodo 4 | 21 abr 2027 | 21 abr 2027 |
-| **4º seguimiento** — 7 jun 2027 | | |
+| Ingreso — 7 may 2026 | 6 atenciones sin fecha (exigibles desde el 8 sep) | 22 may |
+| **Plan de caso** — 7 jun 2026 | | 7 jun · 7 jul · 7 ago |
+| **1er seguimiento** — 7 sep 2026 | 7 oct · 7 nov · 2 dic | 7 sep · 7 oct · 7 nov |
+| **2º seguimiento** — 7 dic 2026 | 7 ene · 7 feb · 2 mar 2027 | 7 dic · 7 ene · 7 feb |
+| **3er seguimiento** — 7 mar 2027 | 7 abr · 7 may · 2 jun 2027 | … |
+
+Nutrición (caso especial, 1 al mes): 7 jun, 7 jul, 7 ago… · (2 al mes): 22 may, 7 jun,
+22 jun, 7 jul…
 
 ### Ingreso 31 de enero de 2027 (fin de mes, año no bisiesto)
 
-| Hito / bloque | Fechas |
-|---|---|
-| **Plan de caso** | 28 feb 2027 (día ancla: 28) |
-| Periodo 1 | 15 mar · 28 mar · 12 abr · 28 abr · 13 may |
-| **1er seguimiento** | 28 may 2027 |
-| Periodo 2 | 28 jun · 28 jul · 23 ago |
-| **2º seguimiento** | 28 ago 2027 |
-| Periodo 3 | 12 oct 2027 |
-| **3er seguimiento** | 28 nov 2027 |
+| Hito / bloque | Trabajo social y Psicología | Académico |
+|---|---|---|
+| Ingreso — 31 ene 2027 | 6 atenciones sin fecha (exigibles desde el 29 may) | enero sin atención (día 31) |
+| **Plan de caso** — 28 feb 2027 (ancla 28) | | 28 feb · 31 mar · 30 abr |
+| **1er seguimiento** — 28 may 2027 | 28 jun · 28 jul · 23 ago | 31 may · 30 jun · 31 jul |
+| **2º seguimiento** — 28 ago 2027 | 28 sep · 28 oct · 23 nov | 31 ago · 30 sep · 31 oct |
+| **3er seguimiento** — 28 nov 2027 | | |
 
 ### Ingreso 30 de octubre de 2026 (el ancla vuelve después de febrero)
 
-| Hito / bloque | Fechas |
+| Hito / bloque | Trabajo social y Psicología |
 |---|---|
 | **Plan de caso** | 30 nov 2026 (día ancla: 30) |
-| Periodo 1 | 15 dic · 30 dic · 14 ene · 30 ene · 14 feb |
 | **1er seguimiento** | **28 feb 2027** (febrero no tiene 30) |
-| Periodo 2 | 30 mar · 30 abr · 25 may |
+| Bloque 1 | 30 mar · 30 abr · 25 may |
 | **2º seguimiento** | **30 may 2027** (vuelve al ancla) |
-| Periodo 3 | 14 jul 2027 |
+| Bloque 2 | 30 jun · 30 jul · 25 ago |
 | **3er seguimiento** | 30 ago 2027 |
-
-## 10. Pendientes por definir
-

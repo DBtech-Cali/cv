@@ -34,7 +34,7 @@ Complementa [`reglas-atencion.md`](reglas-atencion.md) y
 
 | Rol | Personas | Puede |
 |---|---|---|
-| Profesional | Psicóloga, Trabajadora social, Nutricionista, Pedagoga (una por cargo) | Marcar y desmarcar **cualquier ítem de cualquier pestaña**; registrar comodines, fechas y excepciones; marcar caso especial de Nutrición; asumir el nivel de riesgo |
+| Profesional | Psicóloga, Trabajadora social, Nutricionista, Pedagogo (uno por cargo) | Marcar y desmarcar **cualquier ítem de cualquier pestaña**; registrar comodines, fechas y traslado; marcar caso especial de Nutrición y sus frecuencias; asumir el nivel de riesgo |
 | Administrador | Coordinador, Gestor de caso (mismos permisos) | Todo lo del profesional, más: registrar niños nuevos, corregir la fecha de ingreso, egresos y bajas, crear y dar de baja usuarios, reportes, revisión |
 
 - **Responsable del nivel de riesgo:** lo marca la psicóloga o la trabajadora social
@@ -55,13 +55,12 @@ Pendientes agrupados por responsable:
 
 | Pendiente | Reporte |
 |---|---|
-| Pestaña Preliminar | Psicóloga |
-| Pestaña Psicología y sus atenciones | Psicóloga |
 | Pestaña Trabajo social y sus atenciones | Trabajadora social |
+| Pestaña Psicología y sus atenciones | Psicóloga |
 | Seguimientos de nivel de riesgo | La responsable (Psicóloga o Trabajadora social) |
-| Pestañas Nutrición y Salud, atenciones de Nutrición | Nutricionista |
-| Pestañas Pedagogía y Escuela, atenciones de Pedagogía | Pedagoga |
-| Inicio, Pacto de convivencia, Socio legal, Informes, Proyecto de vida | General |
+| Pestañas Nutrición e Historia médica, atenciones de Nutrición | Nutricionista |
+| Pestañas Académico y Proyecto de vida, atenciones de Académico | Pedagogo |
+| Inicial, Socio legal, Informes | General |
 
 ## 6. Registro de niños
 
@@ -74,7 +73,7 @@ Lo hacen solo los **administradores** (también el egreso y la baja).
 | Segundo apellido | No |
 | Fecha de ingreso (base de todo el calendario) | Sí |
 | Caja | Sí |
-| Fecha de nacimiento | No (si está, permite avisar cuando cumpla 7 años y falte la tarjeta de identidad) |
+| Fecha de nacimiento | No |
 
 Volumen aproximado: **60 niños** activos.
 

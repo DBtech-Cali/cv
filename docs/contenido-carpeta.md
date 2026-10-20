@@ -9,102 +9,107 @@ Las fechas de plan de caso, seguimientos y atenciones están en
 ### Porcentaje de cumplimiento por pestaña
 
 - **% = ítems cumplidos / ítems exigibles a la fecha.**
-- Los ítems **opcionales** no suman ni restan.
+- Los ítems **opcionales** y las **listas libres** no suman ni restan.
 - Un ítem **con fecha** se exige desde el **día siguiente** a su fecha (el mismo día
   todavía se puede entregar sin que cuente como faltante).
 - Un ítem **sin fecha** se exige desde el **día del ingreso**.
 - Si una pestaña aún no tiene ítems exigibles, se muestra como "sin pendientes aún".
 - Un ítem marcado pero **vencido** (por ejemplo, ADRES fuera de vigencia) cuenta
   como no cumplido.
+- Cada casilla es **independiente**. Si un documento aparece en dos pestañas (ADRES,
+  portabilidad, historia médica) es porque la carpeta lleva dos copias: se marca por
+  separado en cada una.
 
 ### Porcentaje general del niño
 
 - **Promedio de los porcentajes de las pestañas** que tienen ítems exigibles
   (las pestañas "sin pendientes aún" no entran en el promedio).
 
-### Comodines (solicitudes de documentos que dependen de terceros)
+### Comodines (solicitudes de documentos que llegan de afuera)
 
 Un comodín vigente hace que los documentos faltantes que cubre **cuenten como
 cumplidos**. Un comodín vencido cuenta **como si no existiera**: los faltantes vuelven
 a contar como faltantes.
 
-- Una sola solicitud cubre **todos** los faltantes de su pestaña.
+- **Todos los comodines valen 1 semana** desde la fecha de envío.
+  Ejemplo: solicitud del 7 de mayo vale hasta el 14 de mayo; desde el 15 está vencida.
+- Una sola solicitud cubre **todos** los faltantes que le corresponden (uno o varios).
 - Se registra la **fecha del último envío**; al reiterar se reemplaza (sin historial).
 - **No se puede desmarcar** mientras falte algún documento que cubre.
 
-| Tipo | Vigencia | Pestañas |
-|---|---|---|
-| Simple | 2 meses calendario | Inicio, Socio legal |
-| Simple | 1 mes calendario | Escuela |
-| Escalera | Carta 1 → Carta 2 → Carta 3 (1 mes c/u) → Correo a Defensoría (sin vencimiento) | Salud |
+| Pestaña | Cubre |
+|---|---|
+| Inicial | Los 4 documentos de la pestaña |
+| Socio legal | Las 3 valoraciones (Psicología, Trabajo social, Nutrición) |
 
-Ejemplo de vigencia de 2 meses: correo del 7 de mayo vale hasta el 7 de julio;
-desde el 8 de julio está vencido.
+Ninguna otra pestaña tiene comodín.
 
-Ejemplo de cálculo (Inicio, 5 requeridos, 2 faltan):
+Ejemplo de cálculo (Inicial, 4 requeridos, 2 faltan):
 
 | Situación | Resultado |
 |---|---|
 | Comodín vigente | 100 % |
-| Comodín vencido | 3/5 = 60 % |
-| Sin comodín | 3/5 = 60 % |
-
-### Excepciones
-
-Casillas que exoneran un ítem. Si se marcan, ese ítem deja de exigirse.
-
-| Excepción | Pestaña | Exonera | Motivo escrito |
-|---|---|---|---|
-| Menor de 7 años | Socio legal | Tarjeta de identidad | No |
-| Exonerado de crecimiento y desarrollo | Salud | Crecimiento y desarrollo | Sí (texto libre) |
+| Comodín vencido | 2/4 = 50 % |
+| Sin comodín | 2/4 = 50 % |
 
 ## 2. Pestañas
 
-### 2.1 Inicio
+Orden: Inicial · Socio legal · Informes · Trabajo social · Psicología · Historia
+médica · Nutrición · Académico · Proyecto de vida.
 
-Documentos remitidos por la Defensoría.
+### 2.1 Inicial
 
 | Ítem | Tipo | Comodín |
 |---|---|---|
+| Lista de chequeo | Requerido | Sí |
 | Boleta de ingreso | Requerido | Sí |
-| PARD (auto de apertura) | Requerido | Sí |
-| Valoración de Trabajo Social | Requerido | Sí |
-| Valoración de Psicología | Requerido | Sí |
-| Valoración de Nutrición | Requerido (siempre, aunque Nutrición no se active) | Sí |
-| Correo de solicitud a autoridad / Defensoría | Comodín simple, 2 meses | — |
+| Ficha de ingreso | Requerido | Sí |
+| Pacto de convivencia | Requerido | Sí |
+| Correo de solicitud | Comodín, 1 semana | — |
 
-### 2.2 Preliminar
+### 2.2 Socio legal
 
-| Ítem | Tipo | Fecha | Comodín |
-|---|---|---|---|
-| Evaluación preliminar | Requerido | Ingreso + 5 días | No |
-
-### 2.3 Pacto de convivencia
-
-| Ítem | Tipo | Fecha | Comodín |
-|---|---|---|---|
-| Pacto de convivencia firmado | Requerido | Sin fecha | No |
-
-### 2.4 Socio legal
+Todo se exige a **todos** los niños (modalidad especial). Cada ítem es una casilla
+propia.
 
 | Ítem | Tipo | Comodín |
 |---|---|---|
-| Tarjeta de identidad del niño | Requerido (exonerable: menor de 7 años) | Sí |
-| Registro civil del niño | Requerido | Sí |
-| Cédula del acudiente | Requerido | Sí |
-| ADRES (afiliación en salud) | Requerido, **vigencia 3 meses** desde la fecha del documento | **No** |
-| Recibo de servicios (estrato) | Opcional | Sí |
-| Carta / correo de solicitud | Comodín simple, 2 meses | — |
+| Acta de buen trato | Requerido | No |
+| Auto de trámite | Requerido | No |
+| Valoración de Psicología | Requerido | Sí |
+| Valoración de Trabajo social | Requerido | Sí |
+| Valoración de Nutrición | Requerido | Sí |
+| Declaración ante la Unidad de Víctimas | Requerido | No |
+| Denuncia | Requerido | No |
+| ADRES (afiliación en salud) | Requerido, **vigencia 3 meses** desde la fecha del documento | No |
+| Portabilidad | Requerido | No |
+| Entrevista GAO | Requerido | No |
+| Solicitud de cupo (la hace la Defensora para esta modalidad) | Requerido | No |
+| Solicitud de CODA | Requerido | No |
+| CODA | Requerido | No |
+| Historial médico | Requerido | No |
+| Tarjeta de identidad | Requerido | No |
+| Solicitud de valoraciones | Comodín, 1 semana | — |
+
+**Traslado de otra institución:** casilla "Viene de traslado". Si se marca, se exigen
+además:
+
+| Ítem | Tipo |
+|---|---|
+| Acta de ubicación | Requerido |
+| Asistencia técnica | Requerido |
+| Solicitud de cupo del traslado (distinta a la de la Defensora) | Requerido |
 
 ADRES: al marcarlo se registra su fecha. Ejemplo con hoy 13 oct: ADRES del 13 jul es
 válido (último día); del 12 jul está vencido.
 
-### 2.5 Informes
+### 2.3 Informes
 
 Pestaña que **crece con el tiempo**. Solo se exige lo que ya debió existir.
 
 | Ítem | Se exige desde |
 |---|---|
+| Evaluación preliminar | Ingreso + 5 días |
 | Evaluación integradora (distinta a la preliminar) | Ingreso + 22 días |
 | Acta de caso de la evaluación integradora | Misma fecha que la evaluación integradora |
 | Plan de caso | Ingreso + 1 mes (día ancla) |
@@ -112,89 +117,77 @@ Pestaña que **crece con el tiempo**. Solo se exige lo que ya debió existir.
 | Seguimiento N | Plan de caso + 3·N meses |
 | Correo de envío del seguimiento N | Misma fecha que el seguimiento N |
 
-Sin comodín. Ejemplo (ingreso 7 may): el 15 jul se exigen 4 ítems; el 15 oct, 6.
+Sin comodín.
 
-### 2.6 Salud
-
-Documentos que se piden al acudiente.
+### 2.4 Trabajo social
 
 | Ítem | Tipo |
 |---|---|
-| Vacunas | Requerido, sin vigencia |
-| Valoración médica general | Requerido, sin vigencia |
-| Crecimiento y desarrollo | Requerido (exonerable con motivo) |
-| Carta 1 / 2 / 3 al acudiente | Comodín escalera, 1 mes cada una |
-| Correo a Defensoría | Comodín final, sin vencimiento |
+| Responsable del nivel de riesgo | Selector: Trabajo social o Psicología |
+| Solicitud de llamada | Requerido, sin fecha |
+| Atenciones de Trabajo social | 6 sin fecha antes del 1er seguimiento, luego 3 por bloque (ver `reglas-atencion.md`) |
+| Seguimientos de nivel de riesgo | Si Trabajo social es la responsable |
+| Formato hoja de llamada | Opcional (se deposita al final), no afecta el % |
+| Solicitudes de visita | Lista libre: fecha, persona y parentesco. No afecta el % |
 
-Escalera: falta un documento → carta 1 (vale 1 mes) → si vence sin respuesta,
-carta 2 → carta 3 → 1 mes después de la carta 3 se exige el correo a Defensoría.
-Una vez enviado ese correo, la pestaña queda al 100 %.
+Sin comodín.
+
+### 2.5 Psicología
+
+| Ítem | Tipo |
+|---|---|
+| Atenciones de ingreso: valoración de consumo, estado físico, adaptación, seguimiento a la adaptación, gustos y preferencias, estado emocional | Sin fecha; exigibles desde el día siguiente al 1er seguimiento |
+| Atenciones mensuales | 3 por bloque desde el 1er seguimiento (ver `reglas-atencion.md`) |
+| Seguimientos de nivel de riesgo | Si Psicología es la responsable |
+
+Sin comodín.
+
+### 2.6 Historia médica
+
+| Ítem | Tipo |
+|---|---|
+| ADRES | Requerido, **vigencia 3 meses** (copia propia, independiente de la de Socio legal) |
+| Portabilidad | Requerido |
+| Historia médica | Requerido |
+
+Sin comodín.
 
 ### 2.7 Nutrición
 
 | Ítem | Tipo |
 |---|---|
-| Valoración nutricional inicial (del nutricionista de la modalidad, distinta a la de Inicio) | Requerido |
-| Tallaje (peso y talla) con fecha completa | Requerido, con vigencia |
-| Casilla "Caso especial" (exceso / déficit de peso) | Activa atenciones |
-| Atenciones de Nutrición | Solo si es caso especial (ver `reglas-atencion.md`) |
+| Evaluación nutricional inicial (del nutricionista de la modalidad, distinta a la valoración de Socio legal) | Requerido |
+| Peso y talla, con fecha completa | Requerido, con vigencia |
+| Casilla "Caso especial" (exceso / déficit de peso) | Activa las atenciones y la frecuencia propia del peso y talla |
+| Atenciones de Nutrición | Solo si es caso especial, con la frecuencia que elija la nutricionista (ver `reglas-atencion.md`) |
 
-Vigencia del tallaje desde su fecha: **6 meses** (peso adecuado) o **3 meses**
-(caso especial). Al desmarcar el caso especial vuelve a 6 meses.
+Vigencia del peso y talla desde su fecha:
 
-Sin comodín.
-
-### 2.8 Trabajo social
-
-| Ítem | Tipo |
-|---|---|
-| Pacto de familia | Requerido, sin fecha |
-| Análisis del auxilio de transporte | Requerido, sin fecha (no importa si se aprueba) |
-| Atenciones de Trabajo Social | Según calendario |
-| Seguimientos de nivel de riesgo | Si TS es la responsable |
+- Niño regular: **6 meses**.
+- Caso especial: **1, 2 o 3 meses**, según elija la nutricionista. Al desactivar el
+  caso especial vuelve a 6 meses.
 
 Sin comodín.
 
-### 2.9 Psicología
+### 2.8 Académico
 
 | Ítem | Tipo |
 |---|---|
-| Atenciones de Psicología | Según calendario |
-| Seguimientos de nivel de riesgo | Si Psicología es la responsable |
+| Valoración inicial pedagógica | Requerido, **ingreso + 20 días** |
+| Atenciones de Académico | Mensuales desde el ingreso (ver `reglas-atencion.md`) |
+| Matrícula del año en curso (se registra el año) | Requerido |
+| Vinculaciones (deporte, arte, etc.) | Lista libre: nombre y fecha opcional. No afecta el % |
+| Cursos (cuando recibe certificado) | Lista libre: nombre y fecha opcional. No afecta el % |
+
+Matrícula: desde el 1 de enero se exige la del nuevo año.
 
 Sin comodín.
 
-### 2.10 Escuela
+### 2.9 Proyecto de vida
 
 | Ítem | Tipo |
 |---|---|
-| Boletín | Requerido, sin periodicidad (está o no está) |
-| Constancia de estudio del año en curso (se registra el año) | Requerido |
-| Carta de solicitud | Comodín simple, 1 mes (cubre boletín y constancia) |
-
-Desde el 1 de enero se exige la constancia del nuevo año (o la carta).
-Sin excepciones: todo niño debe estar escolarizado.
-
-### 2.11 Pedagogía
-
-| Ítem | Tipo |
-|---|---|
-| Ficha inicial pedagógica | Requerido, sin fecha |
-| Atenciones de Pedagogía | Según calendario |
-| Vinculaciones (deporte, arte, etc.) | Opcional, lista libre (nombre + fecha opcional), no afecta el % |
+| Exploración vocacional | Requerido, sin fecha |
+| Plan de vida | Requerido, sin fecha |
 
 Sin comodín.
-
-### 2.12 Proyecto de vida
-
-| Ítem | Tipo |
-|---|---|
-| Proyecto de vida entregado | Requerido, sin fecha |
-
-Sin comodín.
-
-## 3. Pendientes por definir
-
-- Fecha de nacimiento del niño: si se registra, avisar cuando cumpla 7 años y falte
-  la tarjeta de identidad.
-- Vistas: ver `vista-general.md`.

@@ -7,7 +7,7 @@ tocan y qué está vencido.
 Las reglas del negocio están en `docs/`:
 
 - `reglas-atencion.md`: calendario de plan de caso, seguimientos y atenciones.
-- `contenido-carpeta.md`: las 12 pestañas, comodines, excepciones y porcentajes.
+- `contenido-carpeta.md`: las 9 pestañas, comodines y porcentajes.
 - `roles-y-permisos.md`: PIN, roles, préstamos, cajas y correo semanal.
 - `vista-general.md`: pantallas y diseño.
 
@@ -22,7 +22,7 @@ npm run build      # versión para publicar (carpeta dist/)
 
 Sin configuración de Firebase la app arranca en **modo demostración**: datos de
 ejemplo guardados solo en el navegador. PIN de prueba: 1111 Psicóloga, 2222 Trabajo
-social, 3333 Nutrición, 4444 Pedagoga, 9999 Coordinador, 8888 Gestor de caso.
+social, 3333 Nutrición, 4444 Pedagogo, 9999 Coordinador, 8888 Gestor de caso.
 
 ## Código
 
