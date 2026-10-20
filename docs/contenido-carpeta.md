@@ -177,7 +177,7 @@ Sin comodín.
 | Atenciones de Académico | Mensuales desde el ingreso (ver `reglas-atencion.md`) |
 | Matrícula del año en curso (se registra el año) | Requerido |
 | Vinculaciones (deporte, arte, etc.) | Lista libre: nombre y fecha opcional. No afecta el % |
-| Cursos (cuando recibe certificado) | Lista libre: nombre y fecha opcional. No afecta el % |
+| Cursos (cuando recibe certificado) | Lista libre: nombre del curso, entidad que certifica y fecha opcional. No afecta el % |
 
 Matrícula: desde el 1 de enero se exige la del nuevo año.
 
