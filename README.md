@@ -40,9 +40,10 @@ demostración).
 1. **Authentication**: método Correo/contraseña activo y un usuario con el correo de la
    aplicación. Es el acceso general de cada tablet o computador.
 2. **Firestore**: base de datos creada y reglas de `firestore.rules` publicadas.
-3. **Publicación automática en GitHub Pages**: el flujo `.github/workflows/publicar.yml`
-   publica en <https://dbtech-cali.github.io/carpeta/> cada vez que cambia `main`.
-   Requiere, una sola vez, **Settings → Pages → Source: GitHub Actions** en el
-   repositorio. Firebase solo guarda los datos y el inicio de sesión.
+3. **Vista previa en GitHub Pages** (modo demostración, sin Firebase): el flujo
+   `.github/workflows/vista-previa.yml` publica en <https://dbtech-cali.github.io/cv/>
+   cada vez que cambia la rama de trabajo. Requiere, una sola vez,
+   **Settings → Pages → Source: Deploy from a branch → `gh-pages` / `(root)`**.
+   La publicación definitiva, conectada a Firebase, está pendiente.
 4. La primera vez que se abre la app, pide crear el **primer administrador**; los demás
    usuarios se crean desde **Administración → Usuarios y PIN**.
