@@ -1,5 +1,5 @@
 // Datos en Firebase (Firestore). Colecciones: ninos, usuarios, movimientos, revisiones, historial.
-import { type FirebaseApp, initializeApp } from 'firebase/app';
+import { type FirebaseApp, FirebaseError, initializeApp } from 'firebase/app';
 import { type Auth, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
 import {
   addDoc, collection, deleteField, doc, type Firestore, getFirestore, limit, onSnapshot, orderBy, query,
@@ -20,6 +20,17 @@ export const hayFirebase = !!(configFirebase.apiKey && configFirebase.projectId)
 /** Quita los campos undefined, que Firestore no acepta. */
 function limpio<T extends object>(o: T): T {
   return JSON.parse(JSON.stringify(o)) as T;
+}
+
+/** Explica en palabras sencillas por qué no se pudieron leer los datos. */
+function mensajeError(coleccion: string, e: FirebaseError): string {
+  if (e.code === 'permission-denied') {
+    return `Firestore no dejó leer "${coleccion}" con esta cuenta. Revisa que las reglas de firestore.rules estén publicadas y que la cuenta de la tablet sea la que indican las reglas.`;
+  }
+  if (e.code === 'not-found' || e.code === 'failed-precondition') {
+    return `No se encontró la base de datos de Firestore (${e.code}). Revisa que esté creada en el proyecto de Firebase.`;
+  }
+  return `No se pudieron leer los datos (${e.code}): ${e.message}`;
 }
 
 export class RepositorioFirebase implements Repositorio {
@@ -47,7 +58,8 @@ export class RepositorioFirebase implements Repositorio {
     return signOut(this.auth);
   }
 
-  suscribir(cb: (d: Datos) => void) {
+  suscribir(cb: (d: Datos) => void, onError?: (mensaje: string) => void) {
+    const fallo = (coleccion: string) => (e: FirebaseError) => onError?.(mensajeError(coleccion, e));
     const datos: Datos = { ninos: [], usuarios: [], movimientos: [], revisiones: [] };
     const listos = new Set<string>();
     const avisar = (clave: string) => {
@@ -58,19 +70,19 @@ export class RepositorioFirebase implements Repositorio {
       onSnapshot(collection(this.db, 'ninos'), (s) => {
         datos.ninos = s.docs.map((d) => ({ marcas: {}, ...d.data(), id: d.id }) as Nino);
         avisar('ninos');
-      }),
+      }, fallo('ninos')),
       onSnapshot(collection(this.db, 'usuarios'), (s) => {
         datos.usuarios = s.docs.map((d) => ({ ...d.data(), id: d.id }) as Usuario);
         avisar('usuarios');
-      }),
+      }, fallo('usuarios')),
       onSnapshot(query(collection(this.db, 'movimientos'), orderBy('en', 'desc'), limit(200)), (s) => {
         datos.movimientos = s.docs.map((d) => ({ ...d.data(), id: d.id }) as Movimiento);
         avisar('movimientos');
-      }),
+      }, fallo('movimientos')),
       onSnapshot(query(collection(this.db, 'revisiones'), orderBy('en', 'desc'), limit(200)), (s) => {
         datos.revisiones = s.docs.map((d) => ({ ...d.data(), id: d.id }) as Revision);
         avisar('revisiones');
-      }),
+      }, fallo('revisiones')),
     ];
     return () => subs.forEach((u) => u());
   }

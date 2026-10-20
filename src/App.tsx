@@ -22,9 +22,16 @@ export function App({ repo }: { repo: Repositorio }) {
   const [datos, setDatos] = useState<Datos | null>(null);
   const [sesion, setSesion] = useState<Sesion | null>(null);
   const [hoy, setHoy] = useState(hoyFecha);
+  const [error, setError] = useState<string | null>(null);
   const ruta = useRuta();
 
-  useEffect(() => repo.suscribir(setDatos), [repo]);
+  useEffect(() => repo.suscribir(setDatos, setError), [repo]);
+  // Si la base de datos no existe o no hay conexión, Firestore no siempre avisa: sigue reintentando.
+  useEffect(() => {
+    if (datos) return;
+    const t = setTimeout(() => setError((e) => e ?? 'Firestore no responde. Revisa la conexión a internet y que la base de datos de Firestore esté creada en el proyecto de Firebase.'), 20_000);
+    return () => clearTimeout(t);
+  }, [datos]);
   // La tablet puede quedar encendida varios días: actualiza "hoy" cada minuto.
   useEffect(() => {
     const t = setInterval(() => setHoy(hoyFecha()), 60_000);
@@ -45,6 +52,22 @@ export function App({ repo }: { repo: Repositorio }) {
 
   const entrar = useCallback((u: Usuario) => ambito && setSesion({ ambito, usuario: u }), [ambito]);
   const soloAdmin = useCallback((u: Usuario) => (esAdmin(u) ? null : 'Solo coordinación, gestión de caso o soporte.'), []);
+
+  if (!ctx && error) {
+    return (
+      <div className="pin-fondo">
+        <div className="pin" role="alert">
+          <Estrella tam={72} />
+          <h1 className="titulo" style={{ fontSize: 26 }}>No se pudieron cargar las carpetas</h1>
+          <p style={{ margin: 0 }}>{error}</p>
+          <div className="fila-wrap" style={{ justifyContent: 'center' }}>
+            <button type="button" className="btn btn--primario" onClick={() => window.location.reload()}>Reintentar</button>
+            {repo.cerrarAcceso && <button type="button" className="btn btn--suave" onClick={() => repo.cerrarAcceso!()}>Cambiar de cuenta</button>}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!ctx) {
     return (

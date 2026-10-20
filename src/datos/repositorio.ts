@@ -18,7 +18,8 @@ export interface EntradaHistorial {
 /** Acceso a los datos. Hay dos implementaciones: Firebase y demostración local. */
 export interface Repositorio {
   modo: 'demo' | 'firebase';
-  suscribir(cb: (d: Datos) => void): () => void;
+  /** Avisa cada cambio de los datos; `onError` recibe un mensaje si no se pueden leer. */
+  suscribir(cb: (d: Datos) => void, onError?: (mensaje: string) => void): () => void;
   marcar(ninoId: string, itemId: string, marca: Marca | null, por: string): Promise<void>;
   actualizarNino(ninoId: string, cambios: Partial<Omit<Nino, 'id' | 'marcas'>>): Promise<void>;
   crearNino(n: Omit<Nino, 'id'>): Promise<void>;
