@@ -33,7 +33,7 @@ social, 3333 Nutrición, 4444 Pedagoga, 9999 Coordinador, 8888 Gestor de caso.
 
 ## Puesta en marcha con Firebase
 
-Proyecto: `emj-archivo`. La configuración pública está en `.env.production`, así que
+Proyecto: `valdocco-45eb5`. La configuración pública está en `.env.production`, así que
 `npm run build` genera la versión conectada a Firebase (y `npm run dev` sigue en modo
 demostración).
 
