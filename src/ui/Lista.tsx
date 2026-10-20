@@ -66,7 +66,7 @@ export function Lista() {
 
         <div className="fila-wrap">
           <label className="buscador">
-            <Icono d={ICONOS.buscar} color="#5A5F7A" />
+            <Icono d={ICONOS.buscar} color="#4F6B70" />
             <span className="oculto">Buscar niño</span>
             <input type="search" placeholder="Buscar por nombre o apellido" value={q} onChange={(e) => setQ(e.target.value)} />
           </label>
@@ -107,7 +107,7 @@ export function Lista() {
                   : <span className={`pastilla ${fuera > DIAS_ALERTA_PRESTAMO ? 'pastilla--rojo' : 'pastilla--ambar'}`}>Fuera · {fuera === 1 ? '1 día' : `${fuera} días`}</span>}
               </span>
               <span className="col-prox fila-wrap" style={{ gap: 8 }}>
-                <Icono d={ICONOS.reloj} tam={16} color="#5A5F7A" />
+                <Icono d={ICONOS.reloj} tam={16} color="#4F6B70" />
                 {vencidos > 0 ? <span className="txt-rojo">{vencidos === 1 ? '1 vencido' : `${vencidos} vencidos`}</span>
                   : siguiente ? <span className={diasEntre(hoy, siguiente.fecha) <= 7 ? 'txt-ambar' : ''}>{siguiente.que} · {corta(siguiente.fecha, hoy)}</span>
                   : <span className="txt-tenue">Nada en 30 días</span>}

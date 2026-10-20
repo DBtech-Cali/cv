@@ -5,7 +5,7 @@ import { type Responsable, RESPONSABLES } from '../dominio/modelo';
 import { Encabezado, useApp } from './comunes';
 
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-const COLOR_PUNTO: Record<Urgencia, string> = { vencido: '#FF7A7F', semana: '#FFD66B', mes: '#A9A3FF' };
+const COLOR_PUNTO: Record<Urgencia, string> = { vencido: '#E5484D', semana: '#F5A524', mes: '#0E9F9A' };
 const ETIQUETA_AREA: Record<Responsable, string> = { psicologia: 'pastilla--violeta', trabajo_social: '', nutricion: 'pastilla--verde', pedagogia: 'pastilla--ambar', general: '' };
 
 export function Agenda() {
@@ -50,9 +50,9 @@ export function Agenda() {
           <aside className="calendario" aria-label={`Calendario de ${MESES[m - 1]}`}>
             <div className="fila-wrap" style={{ justifyContent: 'space-between' }}>
               <h2 className="subtitulo">{MESES[m - 1]} {y}</h2>
-              <span className="etiqueta-mono" style={{ color: 'var(--noche-texto)' }}>{area === 'todos' ? 'Todas las áreas' : RESPONSABLES[area]}</span>
+              <span className="etiqueta-mono" style={{ color: 'var(--tenue)' }}>{area === 'todos' ? 'Todas las áreas' : RESPONSABLES[area]}</span>
             </div>
-            <div className="cal-rejilla etiqueta-mono" style={{ color: 'var(--noche-texto)' }}>
+            <div className="cal-rejilla etiqueta-mono" style={{ color: 'var(--tenue)' }}>
               {['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'].map((d) => <span key={d}>{d}</span>)}
             </div>
             <div className="cal-rejilla">
@@ -68,7 +68,7 @@ export function Agenda() {
                 );
               })}
             </div>
-            <div className="fila-wrap" style={{ fontSize: 13, color: 'var(--noche-texto)', borderTop: '1px solid #2f2f66', paddingTop: 10 }}>
+            <div className="fila-wrap" style={{ fontSize: 13, color: 'var(--tenue)', borderTop: '1px solid var(--borde)', paddingTop: 10 }}>
               {(['vencido', 'semana', 'mes'] as Urgencia[]).map((u) => (
                 <span key={u} className="fila-wrap" style={{ gap: 6 }}>
                   <span className="punto" style={{ background: COLOR_PUNTO[u], width: 10, height: 10 }} />

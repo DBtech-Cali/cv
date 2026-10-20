@@ -4,7 +4,7 @@ import { planDeCaso } from '../dominio/calendario';
 import { evaluarCarpeta, type TabId } from '../dominio/carpeta';
 import { corta, larga } from '../dominio/fechas';
 import { type Nino, nombreCompleto, RESPONSABLES, type Usuario } from '../dominio/modelo';
-import { Barra, Brote, Dialogo, Icono, ICONOS, ICONOS_TAB, useApp } from './comunes';
+import { Barra, Estrella, Dialogo, Icono, ICONOS, ICONOS_TAB, useApp } from './comunes';
 import { Pestana } from './Pestana';
 
 export function Carpeta({ nino, sesion, tab }: { nino: Nino; sesion: Usuario; tab?: TabId }) {
@@ -54,7 +54,7 @@ export function Carpeta({ nino, sesion, tab }: { nino: Nino; sesion: Usuario; ta
       <main className={`pagina ${tab ? 'pagina--angosta' : ''}`}>
         {celebra && (
           <div className="celebra" role="status">
-            <Brote tam={40} feliz />
+            <Estrella tam={40} feliz />
             <strong>{celebra}</strong>
           </div>
         )}
@@ -68,7 +68,7 @@ export function Carpeta({ nino, sesion, tab }: { nino: Nino; sesion: Usuario; ta
                 <span className="etiqueta-mono">Carpeta</span>
                 <h1 className="titulo">{nombreCompleto(nino)}</h1>
                 <div className="fila-wrap" style={{ gap: 8 }}>
-                  <button type="button" className="dato-mono" style={{ border: 'none', color: '#fff', cursor: 'pointer' }} onClick={() => setCambiarCaja(true)}>
+                  <button type="button" className="dato-mono" style={{ cursor: 'pointer' }} onClick={() => setCambiarCaja(true)}>
                     Caja {nino.caja} · cambiar
                   </button>
                   <span className="dato-mono">Ingreso {larga(nino.fechaIngreso)}</span>
@@ -78,9 +78,9 @@ export function Carpeta({ nino, sesion, tab }: { nino: Nino; sesion: Usuario; ta
                 </div>
               </div>
               <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <span style={{ color: 'var(--noche-texto)' }}>Carpeta al día</span>
+                <span style={{ color: 'var(--tenue)' }}>Carpeta al día</span>
                 <Barra pct={ev.pct} gruesa etiqueta="Carpeta al día" />
-                <span style={{ fontSize: 13, color: 'var(--noche-texto)' }}>Promedio de las pestañas con algo exigible a hoy</span>
+                <span style={{ fontSize: 13, color: 'var(--tenue)' }}>Promedio de las pestañas con algo exigible a hoy</span>
               </div>
               <div style={{ flex: '0 1 240px', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <button
@@ -90,7 +90,7 @@ export function Carpeta({ nino, sesion, tab }: { nino: Nino; sesion: Usuario; ta
                 >
                   {nino.prestamo ? 'Devolver carpeta' : 'Retirar carpeta'}
                 </button>
-                <span style={{ fontSize: 13, color: fuera !== null && fuera > DIAS_ALERTA_PRESTAMO ? '#FFB4B7' : 'var(--noche-texto)', lineHeight: 1.4 }}>
+                <span style={{ fontSize: 13, color: fuera !== null && fuera > DIAS_ALERTA_PRESTAMO ? 'var(--rojo-tinta)' : 'var(--tenue)', lineHeight: 1.4 }}>
                   {nino.prestamo
                     ? `Retirada por ${usuario(nino.prestamo.por)?.nombre ?? '—'} · ${new Date(nino.prestamo.desde).toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}${fuera ? ` (hace ${fuera} días)` : ''}. Puedes seguir marcando.`
                     : `En la caja ${nino.caja}`}

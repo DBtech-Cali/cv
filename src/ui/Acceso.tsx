@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from 'react';
-import { Brote } from './comunes';
+import { Estrella } from './comunes';
 
 /** Acceso general de la tablet con la cuenta de la aplicación (una sola vez por equipo). */
 export function Acceso({ entrar }: { entrar: (email: string, clave: string) => Promise<unknown> }) {
@@ -24,10 +24,10 @@ export function Acceso({ entrar }: { entrar: (email: string, clave: string) => P
   return (
     <div className="pin-fondo">
       <form className="pin" onSubmit={enviar}>
-        <Brote tam={72} />
+        <Estrella tam={72} />
         <div>
           <span className="etiqueta-mono">Acceso general del equipo</span>
-          <h1 className="titulo" style={{ fontSize: 28, marginTop: 4 }}>Semillas Salesianas</h1>
+          <h1 className="titulo" style={{ fontSize: 28, marginTop: 4 }}>Casa de Protección</h1>
           <p className="bajada">Se hace una sola vez en cada tablet o computador.</p>
         </div>
         <label className="campo" style={{ width: '100%', textAlign: 'left' }}>Correo de la aplicación

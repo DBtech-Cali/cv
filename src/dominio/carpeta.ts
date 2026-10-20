@@ -1,35 +1,41 @@
 // Evaluación de la carpeta: qué se exige hoy en cada pestaña y cuánto se cumple.
 // Ver docs/contenido-carpeta.md.
-import { atenciones, atencionesNutricion, informes, nivelRiesgo, type AreaAtencion } from './calendario';
+import {
+  ATENCIONES_INGRESO_PSICOLOGIA, atencionesAcademico, atencionesNutricion, atencionesPorBloque, hito, informes,
+  nivelRiesgo, type Programada,
+} from './calendario';
 import { corta, type Fecha, partes, sumarDias, sumarMeses } from './fechas';
 import type { Marca, Nino, Responsable } from './modelo';
 
 export type TabId =
-  | 'inicio' | 'preliminar' | 'pacto' | 'socio_legal' | 'informes' | 'salud'
-  | 'nutricion' | 'trabajo_social' | 'psicologia' | 'escuela' | 'pedagogia' | 'proyecto_vida';
+  | 'inicial' | 'socio_legal' | 'informes' | 'trabajo_social' | 'psicologia'
+  | 'historia_medica' | 'nutricion' | 'academico' | 'proyecto_vida';
 
 export const TABS: { id: TabId; nombre: string; responsable: Responsable }[] = [
-  { id: 'inicio', nombre: 'Inicio', responsable: 'general' },
-  { id: 'preliminar', nombre: 'Preliminar', responsable: 'psicologia' },
-  { id: 'pacto', nombre: 'Pacto de convivencia', responsable: 'general' },
+  { id: 'inicial', nombre: 'Inicial', responsable: 'general' },
   { id: 'socio_legal', nombre: 'Socio legal', responsable: 'general' },
   { id: 'informes', nombre: 'Informes', responsable: 'general' },
-  { id: 'salud', nombre: 'Salud', responsable: 'nutricion' },
-  { id: 'nutricion', nombre: 'Nutrición', responsable: 'nutricion' },
   { id: 'trabajo_social', nombre: 'Trabajo social', responsable: 'trabajo_social' },
   { id: 'psicologia', nombre: 'Psicología', responsable: 'psicologia' },
-  { id: 'escuela', nombre: 'Escuela', responsable: 'pedagogia' },
-  { id: 'pedagogia', nombre: 'Pedagogía', responsable: 'pedagogia' },
-  { id: 'proyecto_vida', nombre: 'Proyecto de vida', responsable: 'general' },
+  { id: 'historia_medica', nombre: 'Historia médica', responsable: 'nutricion' },
+  { id: 'nutricion', nombre: 'Nutrición', responsable: 'nutricion' },
+  { id: 'academico', nombre: 'Académico', responsable: 'pedagogia' },
+  { id: 'proyecto_vida', nombre: 'Proyecto de vida', responsable: 'pedagogia' },
 ];
+
+/** Todos los comodines valen una semana desde la fecha de envío. */
+export const DIAS_COMODIN = 7;
+
+/** Vigencia del peso y talla para un niño regular, en meses. */
+export const MESES_TALLAJE_REGULAR = 6;
 
 /**
  * Cómo se presenta un ítem:
  * - doc: casilla; programada: fecha del calendario; opcional: no suma;
- * - excepcion: exonera otro ítem; comodin: cubre faltantes; interruptor: activa algo (caso especial).
+ * - comodin: cubre faltantes; interruptor: activa otros ítems (traslado).
  */
-export type TipoItem = 'doc' | 'programada' | 'opcional' | 'excepcion' | 'comodin' | 'interruptor';
-export type EstadoItem = 'ok' | 'pendiente' | 'vencido' | 'futuro' | 'cubierto' | 'exonerado' | 'neutro';
+export type TipoItem = 'doc' | 'programada' | 'opcional' | 'comodin' | 'interruptor';
+export type EstadoItem = 'ok' | 'pendiente' | 'vencido' | 'futuro' | 'cubierto' | 'neutro';
 
 export interface ItemEval {
   id: string; // clave en Nino.marcas
@@ -41,10 +47,10 @@ export interface ItemEval {
   estado: EstadoItem;
   nota?: string;
   /** Dato que se pide al marcar. */
-  pide?: 'fecha' | 'anio' | 'texto';
+  pide?: 'fecha' | 'anio';
   grupo?: string;
   fecha?: Fecha; // fecha programada
-  fechaOculta?: boolean; // se exige en `fecha`, pero el ítem no lleva fecha propia (actas, correos)
+  fechaOculta?: boolean; // se exige en `fecha`, pero el ítem no lleva fecha propia (actas, correos, atenciones de ingreso)
   vence?: Fecha; // fin de vigencia de un documento o comodín
   responsable: Responsable;
 }
@@ -68,6 +74,10 @@ export interface CarpetaEval {
 /** Hasta dónde se generan fechas futuras para mostrar en líneas de tiempo y agenda. */
 const HORIZONTE_DIAS = 120;
 
+export function comodinVigente(m: Marca | undefined, hoy: Fecha): boolean {
+  return !!m?.fecha && sumarDias(m.fecha, DIAS_COMODIN) >= hoy;
+}
+
 class Constructor {
   items: ItemEval[] = [];
   avisos: string[] = [];
@@ -82,20 +92,15 @@ class Constructor {
   }
 
   /** Documento sin fecha, que puede estar cubierto por un comodín. */
-  doc(id: string, etiqueta: string, opts: { cubierto?: boolean; exonerado?: string; responsable?: Responsable } = {}) {
+  doc(id: string, etiqueta: string, cubierto = false) {
     const marca = this.marca(id);
-    const resp = opts.responsable ?? this.responsable;
-    if (opts.exonerado) {
-      this.items.push({ id, etiqueta, tipo: 'doc', marca, exigible: false, cumple: false, estado: 'exonerado', nota: opts.exonerado, responsable: resp });
-      return;
-    }
     const exigible = this.exigeSinFecha;
-    const cumple = !!marca || (!!opts.cubierto && exigible);
+    const cumple = !!marca || (cubierto && exigible);
     const estado: EstadoItem = marca ? 'ok' : cumple ? 'cubierto' : exigible ? 'pendiente' : 'futuro';
     this.items.push({
       id, etiqueta, tipo: 'doc', marca, exigible, cumple, estado,
       nota: estado === 'cubierto' ? 'Cubierto por la solicitud enviada' : undefined,
-      responsable: resp,
+      responsable: this.responsable,
     });
   }
 
@@ -105,7 +110,7 @@ class Constructor {
     const exigible = this.exigeSinFecha;
     const vence = marca?.fecha ? sumarMeses(marca.fecha, meses) : undefined;
     const ok = !!vence && this.hoy <= vence;
-    const nota = !marca ? undefined
+    const nota = !marca ? `Vigencia: ${meses === 1 ? '1 mes' : `${meses} meses`} desde la fecha del documento`
       : !vence ? 'Falta la fecha del documento'
       : ok ? `Vigente hasta el ${corta(vence, this.hoy)}`
       : `Venció el ${corta(vence, this.hoy)}: no cuenta aunque esté marcado`;
@@ -116,38 +121,60 @@ class Constructor {
     });
   }
 
-  opcional(id: string, etiqueta: string) {
+  /** Documento del año en curso (se registra el año). Desde el 1 de enero se exige el del año nuevo. */
+  anual(id: string, etiqueta: string) {
     const marca = this.marca(id);
-    this.items.push({ id, etiqueta, tipo: 'opcional', marca, exigible: false, cumple: false, estado: 'neutro', nota: 'Opcional: no suma ni resta', responsable: this.responsable });
+    const anio = partes(this.hoy).y;
+    const deEsteAnio = marca?.anio === anio;
+    const exigible = this.exigeSinFecha;
+    this.items.push({
+      id, etiqueta: `${etiqueta} ${anio}`, tipo: 'doc', marca, exigible, cumple: exigible && deEsteAnio,
+      estado: deEsteAnio ? 'ok' : marca ? 'vencido' : exigible ? 'pendiente' : 'futuro',
+      nota: marca && !deEsteAnio ? `La marcada es de ${marca.anio}: se necesita la de ${anio}` : undefined,
+      pide: 'anio', responsable: this.responsable,
+    });
   }
 
-  excepcion(id: string, etiqueta: string, nota: string, conMotivo = false) {
+  opcional(id: string, etiqueta: string, nota = 'Opcional: no suma ni resta') {
     const marca = this.marca(id);
-    this.items.push({ id, etiqueta, tipo: 'excepcion', marca, exigible: false, cumple: false, estado: 'neutro', nota: marca?.texto ? `Motivo: ${marca.texto}` : nota, pide: conMotivo ? 'texto' : undefined, responsable: this.responsable });
+    this.items.push({ id, etiqueta, tipo: 'opcional', marca, exigible: false, cumple: false, estado: 'neutro', nota, responsable: this.responsable });
+  }
+
+  /** Casilla que activa otros ítems. Devuelve si está marcada. */
+  interruptor(id: string, etiqueta: string, nota: string) {
+    const marca = this.marca(id);
+    this.items.push({ id, etiqueta, tipo: 'interruptor', marca, exigible: false, cumple: false, estado: 'neutro', nota, responsable: this.responsable });
     return !!marca;
   }
 
-  /** Comodín simple: vale `meses` desde su fecha. Devuelve si está vigente. */
-  comodin(id: string, etiqueta: string, meses: number, cubre: string) {
+  /** Comodín: vale una semana desde su fecha de envío. */
+  comodin(id: string, etiqueta: string, cubre: string) {
     const marca = this.marca(id);
-    const vence = marca?.fecha ? sumarMeses(marca.fecha, meses) : undefined;
-    const vigente = !!vence && this.hoy <= vence;
-    const nota = !marca ? `Cubre ${cubre} mientras esté vigente (${meses === 1 ? '1 mes' : `${meses} meses`})`
+    const vence = marca?.fecha ? sumarDias(marca.fecha, DIAS_COMODIN) : undefined;
+    const vigente = comodinVigente(marca, this.hoy);
+    const nota = !marca ? `Cubre ${cubre} durante 1 semana`
       : vigente ? `Enviada el ${corta(marca.fecha!, this.hoy)} · vigente hasta el ${corta(vence!, this.hoy)}`
       : `Venció el ${corta(vence!, this.hoy)}: ya no cubre. Reitera la solicitud con la fecha nueva`;
     this.items.push({ id, etiqueta, tipo: 'comodin', marca, exigible: false, cumple: false, estado: !marca ? 'neutro' : vigente ? 'ok' : 'vencido', nota, pide: 'fecha', vence, responsable: this.responsable });
-    return vigente;
   }
 
-  programada(id: string, etiqueta: string, fecha: Fecha, grupo?: string, responsable?: Responsable, fechaVisible = true) {
+  /**
+   * Actividad del calendario. Se exige desde el día siguiente a `fecha`.
+   * Con `sinFecha`, el ítem no muestra fecha propia y esa nota explica hasta cuándo hacerlo.
+   */
+  programada(id: string, etiqueta: string, fecha: Fecha, opts: { grupo?: string; responsable?: Responsable; sinFecha?: string } = {}) {
     const marca = this.marca(id);
     const exigible = this.hoy > fecha;
     const estado: EstadoItem = marca ? 'ok' : exigible ? 'vencido' : 'futuro';
     this.items.push({
-      id, etiqueta, tipo: 'programada', marca, exigible, cumple: exigible && !!marca, estado, grupo, fecha, fechaOculta: !fechaVisible,
-      nota: fechaVisible ? undefined : `Se exige desde el ${corta(sumarDias(fecha, 1), this.hoy)}`,
-      responsable: responsable ?? this.responsable,
+      id, etiqueta, tipo: 'programada', marca, exigible, cumple: exigible && !!marca, estado,
+      grupo: opts.grupo, fecha, fechaOculta: !!opts.sinFecha, nota: opts.sinFecha,
+      responsable: opts.responsable ?? this.responsable,
     });
+  }
+
+  calendario(prefijo: string, xs: Programada[]) {
+    for (const p of xs) this.programada(`${prefijo}.${p.id}`, p.etiqueta, p.fecha, { grupo: p.grupo });
   }
 
   tab(id: TabId): TabEval {
@@ -161,16 +188,15 @@ class Constructor {
   }
 }
 
-function grupoAtencion(n: number): string {
-  if (n <= 5) return 'Periodo 1 · plan de caso → 1er seguimiento';
-  if (n <= 8) return 'Periodo 2 · 1er → 2º seguimiento';
-  return `Periodo ${n - 6} · ${n - 7}º → ${n - 6}º seguimiento`;
-}
-
-function atencionesDeArea(c: Constructor, nino: Nino, hasta: Fecha, area: AreaAtencion) {
-  for (const a of atenciones(nino.fechaIngreso, hasta)) {
-    c.programada(`ate.${area}.${a.id}`, a.etiqueta, a.fecha, grupoAtencion(Number(a.id)));
+/** Las 6 atenciones de ingreso (sin fecha propia) y luego 3 por bloque trimestral. */
+function atencionesConIngreso(c: Constructor, nino: Nino, hoy: Fecha, hasta: Fecha, area: 'psicologia' | 'trabajo_social') {
+  const seg1 = hito(nino.fechaIngreso, 1);
+  const nota = hoy > seg1 ? `Debía hacerse antes del 1er seguimiento (${corta(seg1, hoy)})` : `Hacer antes del 1er seguimiento (${corta(seg1, hoy)})`;
+  for (let i = 1; i <= 6; i++) {
+    const etiqueta = area === 'psicologia' ? ATENCIONES_INGRESO_PSICOLOGIA[i - 1] : `Atención ${i}`;
+    c.programada(`ate.${area}.${i}`, etiqueta, seg1, { sinFecha: nota });
   }
+  c.calendario(`ate.${area}`, atencionesPorBloque(nino.fechaIngreso, hasta));
 }
 
 function riesgo(c: Constructor, nino: Nino, hasta: Fecha, area: 'psicologia' | 'trabajo_social') {
@@ -180,127 +206,73 @@ function riesgo(c: Constructor, nino: Nino, hasta: Fecha, area: 'psicologia' | '
   }
   if (nino.responsableRiesgo !== area) return;
   for (const r of nivelRiesgo(nino.fechaIngreso, hasta)) {
-    c.programada(`riesgo.${r.id}`, r.etiqueta, r.fecha, 'Seguimiento de nivel de riesgo');
+    c.programada(`riesgo.${r.id}`, r.etiqueta, r.fecha, { grupo: 'Seguimiento de nivel de riesgo' });
   }
-}
-
-function edad(nacimiento: Fecha, hoy: Fecha): number {
-  const n = partes(nacimiento);
-  const h = partes(hoy);
-  return h.y - n.y - (h.m < n.m || (h.m === n.m && h.d < n.d) ? 1 : 0);
 }
 
 export function evaluarCarpeta(nino: Nino, hoy: Fecha): CarpetaEval {
   const hasta = sumarDias(hoy, HORIZONTE_DIAS);
+  const ingreso = nino.fechaIngreso;
   const tabs: TabEval[] = [];
   const nuevo = (id: TabId) => new Constructor(nino, hoy, TABS.find((t) => t.id === id)!.responsable);
 
-  // Inicio
+  // Inicial: todo llega de afuera; el comodín cubre los cuatro documentos.
   {
-    const c = nuevo('inicio');
-    const com = c.marca('inicio.comodin');
-    const cubre = !!com?.fecha && sumarMeses(com.fecha, 2) >= hoy;
-    c.doc('inicio.boleta', 'Boleta de ingreso', { cubierto: cubre });
-    c.doc('inicio.pard', 'PARD (auto de apertura)', { cubierto: cubre });
-    c.doc('inicio.val_ts', 'Valoración de Trabajo social', { cubierto: cubre });
-    c.doc('inicio.val_psico', 'Valoración de Psicología', { cubierto: cubre });
-    c.doc('inicio.val_nutri', 'Valoración de Nutrición', { cubierto: cubre });
-    c.comodin('inicio.comodin', 'Correo de solicitud a la autoridad o Defensoría', 2, 'los documentos faltantes');
-    tabs.push(c.tab('inicio'));
+    const c = nuevo('inicial');
+    const cubre = comodinVigente(c.marca('inicial.comodin'), hoy);
+    c.doc('inicial.lista_chequeo', 'Lista de chequeo', cubre);
+    c.doc('inicial.boleta', 'Boleta de ingreso', cubre);
+    c.doc('inicial.ficha', 'Ficha de ingreso', cubre);
+    c.doc('inicial.pacto', 'Pacto de convivencia', cubre);
+    c.comodin('inicial.comodin', 'Correo de solicitud', 'los documentos faltantes');
+    tabs.push(c.tab('inicial'));
   }
 
-  // Preliminar
-  {
-    const c = nuevo('preliminar');
-    c.programada('preliminar.evaluacion', 'Evaluación preliminar', sumarDias(nino.fechaIngreso, 5));
-    tabs.push(c.tab('preliminar'));
-  }
-
-  // Pacto de convivencia
-  {
-    const c = nuevo('pacto');
-    c.doc('pacto.firmado', 'Pacto de convivencia firmado');
-    tabs.push(c.tab('pacto'));
-  }
-
-  // Socio legal
+  // Socio legal: el comodín cubre solo las tres valoraciones.
   {
     const c = nuevo('socio_legal');
-    const menor = !!c.marca('socio.menor7');
-    const com = c.marca('socio.comodin');
-    const cubre = !!com?.fecha && sumarMeses(com.fecha, 2) >= hoy;
-    c.doc('socio.ti', 'Tarjeta de identidad del niño', { cubierto: cubre, exonerado: menor ? 'No se exige: menor de 7 años' : undefined });
-    c.doc('socio.rc', 'Registro civil del niño', { cubierto: cubre });
-    c.doc('socio.cedula', 'Cédula del acudiente', { cubierto: cubre });
+    const cubre = comodinVigente(c.marca('socio.comodin'), hoy);
+    c.doc('socio.buen_trato', 'Acta de buen trato');
+    c.doc('socio.auto_tramite', 'Auto de trámite');
+    c.doc('socio.val_psico', 'Valoración de Psicología', cubre);
+    c.doc('socio.val_ts', 'Valoración de Trabajo social', cubre);
+    c.doc('socio.val_nutri', 'Valoración de Nutrición', cubre);
+    c.doc('socio.victimas', 'Declaración ante la Unidad de Víctimas');
+    c.doc('socio.denuncia', 'Denuncia');
     c.vigente('socio.adres', 'ADRES · afiliación en salud', 3);
-    c.opcional('socio.recibo', 'Recibo de servicios (estrato)');
-    c.comodin('socio.comodin', 'Carta o correo de solicitud', 2, 'todo menos el ADRES');
-    c.excepcion('socio.menor7', 'Menor de 7 años', 'Exonera la tarjeta de identidad');
-    if (menor && nino.fechaNacimiento && edad(nino.fechaNacimiento, hoy) >= 7) {
-      c.avisos.push('Ya cumplió 7 años: desmarca la excepción y pide la tarjeta de identidad.');
+    c.doc('socio.portabilidad', 'Portabilidad');
+    c.doc('socio.gao', 'Entrevista GAO');
+    c.doc('socio.cupo', 'Solicitud de cupo (Defensoría)');
+    c.doc('socio.sol_coda', 'Solicitud de CODA');
+    c.doc('socio.coda', 'CODA');
+    c.doc('socio.historial', 'Historial médico');
+    c.doc('socio.ti', 'Tarjeta de identidad');
+    const traslado = c.interruptor('socio.traslado', 'Viene de traslado de otra institución', 'Exige el acta de ubicación, la asistencia técnica y la solicitud de cupo del traslado');
+    if (traslado) {
+      c.doc('socio.acta_ubicacion', 'Acta de ubicación (traslado)');
+      c.doc('socio.asistencia_tecnica', 'Asistencia técnica (traslado)');
+      c.doc('socio.cupo_traslado', 'Solicitud de cupo del traslado');
     }
+    c.comodin('socio.comodin', 'Solicitud de valoraciones', 'las tres valoraciones');
     tabs.push(c.tab('socio_legal'));
   }
 
   // Informes
   {
     const c = nuevo('informes');
-    for (const i of informes(nino.fechaIngreso, hasta)) {
+    for (const i of informes(ingreso, hasta)) {
       const sinFecha = i.id.startsWith('correo') || i.id.startsWith('acta');
-      c.programada(`informes.${i.id}`, i.etiqueta, i.fecha, undefined, undefined, !sinFecha);
+      c.programada(`informes.${i.id}`, i.etiqueta, i.fecha, { sinFecha: sinFecha ? `Se exige desde el ${corta(sumarDias(i.fecha, 1), hoy)}` : undefined });
     }
     tabs.push(c.tab('informes'));
-  }
-
-  // Salud
-  {
-    const c = nuevo('salud');
-    const cartas = [1, 2, 3].map((k) => c.marca(`salud.carta${k}`));
-    const defensoria = c.marca('salud.defensoria');
-    const cartaVigente = cartas.some((m) => m?.fecha && sumarMeses(m.fecha, 1) >= hoy);
-    const cubre = !!defensoria || cartaVigente;
-    const exoCyd = !!c.marca('salud.exonera_cyd');
-    c.doc('salud.vacunas', 'Vacunas', { cubierto: cubre });
-    c.doc('salud.val_medica', 'Valoración médica general', { cubierto: cubre });
-    c.doc('salud.cyd', 'Crecimiento y desarrollo', { cubierto: cubre, exonerado: exoCyd ? `Exonerado${c.marca('salud.exonera_cyd')?.texto ? `: ${c.marca('salud.exonera_cyd')!.texto}` : ''}` : undefined });
-    [1, 2, 3].forEach((k) => c.comodin(`salud.carta${k}`, `Carta ${k} al acudiente`, 1, 'los documentos faltantes'));
-    const marcadas = cartas.filter(Boolean).length;
-    const correo = c.marca('salud.defensoria');
-    c.items.push({
-      id: 'salud.defensoria', etiqueta: 'Correo a Defensoría', tipo: 'comodin', marca: correo, exigible: false, cumple: false,
-      estado: correo ? 'ok' : 'neutro', pide: 'fecha', responsable: 'nutricion',
-      nota: correo ? `Enviado el ${corta(correo.fecha ?? hoy, hoy)} · no vence` : 'Tras 3 cartas sin respuesta. No vence',
-    });
-    const faltan = c.items.some((i) => i.tipo === 'doc' && i.estado === 'pendiente');
-    if (faltan && !cubre && !defensoria) {
-      c.avisos.push(marcadas < 3 ? `Siguiente paso: enviar la carta ${marcadas + 1} al acudiente.` : 'Pasó un mes desde la carta 3: enviar el correo a Defensoría.');
-    }
-    c.excepcion('salud.exonera_cyd', 'Exonerado de crecimiento y desarrollo', 'Para mayores sin ese documento. Escribe el motivo', true);
-    tabs.push(c.tab('salud'));
-  }
-
-  // Nutrición
-  {
-    const c = nuevo('nutricion');
-    const activa = !!nino.nutricion;
-    c.doc('nutricion.valoracion_inicial', 'Valoración nutricional inicial');
-    c.vigente('nutricion.tallaje', `Tallaje (peso y talla) · vigencia ${activa ? 3 : 6} meses`, activa ? 3 : 6);
-    if (nino.nutricion) {
-      // Se exigen desde el plan de caso, sin importar cuándo se marcó el caso especial:
-      // al pasar carpetas antiguas a la app aparecen las atenciones que debieron hacerse.
-      for (const a of atencionesNutricion(nino.fechaIngreso, nino.fechaIngreso, hasta)) {
-        c.programada(`ate.nutricion.${a.id}`, a.etiqueta, a.fecha, 'Atenciones de caso especial');
-      }
-    }
-    tabs.push(c.tab('nutricion'));
   }
 
   // Trabajo social
   {
     const c = nuevo('trabajo_social');
-    c.doc('ts.pacto_familia', 'Pacto de familia');
-    c.doc('ts.transporte', 'Análisis del auxilio de transporte');
-    atencionesDeArea(c, nino, hasta, 'trabajo_social');
+    c.doc('ts.solicitud_llamada', 'Solicitud de llamada');
+    c.opcional('ts.hoja_llamada', 'Formato hoja de llamada', 'Se deposita al final: no suma ni resta');
+    atencionesConIngreso(c, nino, hoy, hasta, 'trabajo_social');
     riesgo(c, nino, hasta, 'trabajo_social');
     tabs.push(c.tab('trabajo_social'));
   }
@@ -308,44 +280,47 @@ export function evaluarCarpeta(nino: Nino, hoy: Fecha): CarpetaEval {
   // Psicología
   {
     const c = nuevo('psicologia');
-    atencionesDeArea(c, nino, hasta, 'psicologia');
+    atencionesConIngreso(c, nino, hoy, hasta, 'psicologia');
     riesgo(c, nino, hasta, 'psicologia');
     tabs.push(c.tab('psicologia'));
   }
 
-  // Escuela
+  // Historia médica: copias propias, independientes de las de Socio legal.
   {
-    const c = nuevo('escuela');
-    const anio = partes(hoy).y;
-    const com = c.marca('escuela.comodin');
-    const cubre = !!com?.fecha && sumarMeses(com.fecha, 1) >= hoy;
-    const m = c.marca('escuela.constancia');
-    const deEsteAnio = m?.anio === anio;
-    const exigible = c.exigeSinFecha;
-    c.doc('escuela.boletin', 'Boletín', { cubierto: cubre });
-    c.items.push({
-      id: 'escuela.constancia', etiqueta: `Constancia de estudio ${anio}`, tipo: 'doc', marca: m, exigible,
-      cumple: exigible && (deEsteAnio || cubre),
-      estado: deEsteAnio ? 'ok' : cubre && exigible ? 'cubierto' : m ? 'vencido' : exigible ? 'pendiente' : 'futuro',
-      nota: m && !deEsteAnio ? `La marcada es de ${m.anio}: se necesita la de ${anio}` : cubre && !deEsteAnio ? 'Cubierto por la carta de solicitud' : undefined,
-      pide: 'anio', responsable: 'pedagogia',
-    });
-    c.comodin('escuela.comodin', 'Carta de solicitud', 1, 'el boletín y la constancia');
-    tabs.push(c.tab('escuela'));
+    const c = nuevo('historia_medica');
+    c.vigente('hm.adres', 'ADRES · afiliación en salud', 3);
+    c.doc('hm.portabilidad', 'Portabilidad');
+    c.doc('hm.historia', 'Historia médica');
+    tabs.push(c.tab('historia_medica'));
   }
 
-  // Pedagogía
+  // Nutrición
   {
-    const c = nuevo('pedagogia');
-    c.doc('pedagogia.ficha_inicial', 'Ficha inicial pedagógica');
-    atencionesDeArea(c, nino, hasta, 'pedagogia');
-    tabs.push(c.tab('pedagogia'));
+    const c = nuevo('nutricion');
+    const caso = nino.nutricion;
+    c.doc('nutricion.evaluacion_inicial', 'Evaluación nutricional inicial');
+    const meses = caso ? caso.tallajeMeses : MESES_TALLAJE_REGULAR;
+    c.vigente('nutricion.tallaje', `Peso y talla · cada ${meses === 1 ? 'mes' : `${meses} meses`}`, meses);
+    // Desde el ingreso, sin importar cuándo se marcó el caso especial:
+    // al pasar carpetas antiguas a la app aparecen las atenciones que debieron hacerse.
+    if (caso) c.calendario('ate.nutricion', atencionesNutricion(ingreso, caso.atenciones, hasta));
+    tabs.push(c.tab('nutricion'));
+  }
+
+  // Académico
+  {
+    const c = nuevo('academico');
+    c.programada('academico.valoracion_inicial', 'Valoración inicial pedagógica', sumarDias(ingreso, 20));
+    c.anual('academico.matricula', 'Matrícula');
+    c.calendario('ate.academico', atencionesAcademico(ingreso, hasta));
+    tabs.push(c.tab('academico'));
   }
 
   // Proyecto de vida
   {
     const c = nuevo('proyecto_vida');
-    c.doc('proyecto_vida.entregado', 'Proyecto de vida entregado');
+    c.doc('pv.exploracion', 'Exploración vocacional');
+    c.doc('pv.plan', 'Plan de vida');
     tabs.push(c.tab('proyecto_vida'));
   }
 

@@ -4,13 +4,14 @@ import { hoy, partes, sumarDias } from '../dominio/fechas';
 import type { Marca, Nino, Usuario } from '../dominio/modelo';
 import { ahoraISO, type Datos, type Repositorio } from './repositorio';
 
-const CLAVE = 'semillas-demo-v1';
+// Cambia la clave cuando cambie la estructura de la carpeta, para no leer datos viejos.
+const CLAVE = 'casa-demo-v2';
 
 const USUARIOS: Usuario[] = [
   { id: 'u-psico', nombre: 'Psicóloga', cargo: 'psicologia', pin: '1111', email: '', activo: true },
   { id: 'u-ts', nombre: 'Trabajadora social', cargo: 'trabajo_social', pin: '2222', email: '', activo: true },
   { id: 'u-nutri', nombre: 'Nutricionista', cargo: 'nutricion', pin: '3333', email: '', activo: true },
-  { id: 'u-ped', nombre: 'Pedagoga', cargo: 'pedagogia', pin: '4444', email: '', activo: true },
+  { id: 'u-ped', nombre: 'Pedagogo', cargo: 'pedagogia', pin: '4444', email: '', activo: true },
   { id: 'u-coord', nombre: 'Coordinador', cargo: 'coordinacion', pin: '9999', email: '', activo: true },
   { id: 'u-gestor', nombre: 'Gestor de caso', cargo: 'gestion_caso', pin: '8888', email: '', activo: true },
 ];
@@ -33,9 +34,15 @@ function semilla(): Datos {
     const n: Nino = {
       id: `n${i + 1}`, nombres, primerApellido: a1, segundoApellido: a2, caja, activo: true,
       fechaIngreso: sumarDias(h, -dias), responsableRiesgo: i % 2 ? 'trabajo_social' : 'psicologia', marcas: {},
-      nutricion: i === 7 ? { desde: sumarDias(h, -10) } : null,
+      nutricion: i === 7 ? { desde: sumarDias(h, -10), tallajeMeses: 2, atenciones: 'mensual' } : null,
       prestamo: i === 5 ? { por: 'u-ped', desde: `${sumarDias(h, -9)}T09:00:00.000Z` } : i === 2 ? { por: 'u-ts', desde: `${sumarDias(h, -2)}T10:30:00.000Z` } : null,
     };
+    if (i === 3) n.marcas['socio.traslado'] = { por: 'u-ts', en: `${n.fechaIngreso}T09:00:00.000Z` };
+    if (i === 0) {
+      n.visitas = [{ id: 'v1', fecha: sumarDias(h, -12), persona: 'Juanita Rincón', parentesco: 'tía' }];
+      n.vinculaciones = [{ id: 'vi1', nombre: 'Escuela de fútbol' }];
+      n.cursos = [{ id: 'c1', nombre: 'Manipulación de alimentos', entidad: 'SENA', fecha: sumarDias(h, -40) }];
+    }
     // Marca todo lo exigible y deja sin marcar una parte, de forma estable.
     const usuarios = USUARIOS.map((u) => u.id);
     let k = 0;

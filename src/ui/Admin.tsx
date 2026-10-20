@@ -78,7 +78,6 @@ const ESTADOS_REPORTE: Record<EstadoReporte, [string, string]> = {
   falta: ['Falta', 'pastilla--rojo'],
   vencido: ['Vencido', 'pastilla--rojo'],
   cubierto: ['Cubierto por solicitud', 'pastilla--violeta'],
-  exonerado: ['Exonerado', 'pastilla--ambar'],
   al_dia: ['Al día', 'pastilla--verde'],
   no_aplica: ['Aún no se exige', ''],
 };
@@ -117,10 +116,10 @@ function ReporteItem() {
       <section className="tarjeta" aria-label="Reporte por ítem">
         <div className="fila-wrap" style={{ padding: '18px 22px', borderBottom: '1px solid var(--borde)', justifyContent: 'space-between' }}>
           <div>
-            <span className="etiqueta-mono">Semillas Salesianas · reporte del {larga(hoy)} · {item?.tabNombre}</span>
+            <span className="etiqueta-mono">Casa de Protección Valdocco · reporte del {larga(hoy)} · {item?.tabNombre}</span>
             <h2 className="subtitulo" style={{ marginTop: 2 }}>{item?.etiqueta}</h2>
             <p className="txt-tenue" style={{ margin: '6px 0 0', fontSize: 14 }}>
-              {cuenta('falta')} faltan · {cuenta('vencido')} vencidos · {cuenta('cubierto')} cubiertos por solicitud · {cuenta('exonerado')} exonerados · {cuenta('al_dia')} al día
+              {cuenta('falta')} faltan · {cuenta('vencido')} vencidos · {cuenta('cubierto')} cubiertos por solicitud · {cuenta('al_dia')} al día
             </p>
           </div>
           <button type="button" className="btn btn--primario no-imprimir" onClick={() => window.print()}>
@@ -178,7 +177,7 @@ function ReportesProfesional() {
       <section className="tarjeta" aria-label="Reporte">
         <div className="fila-wrap" style={{ padding: '18px 22px', borderBottom: '1px solid var(--borde)', justifyContent: 'space-between' }}>
           <div>
-            <span className="etiqueta-mono">Semillas Salesianas · reporte del {larga(hoy)}</span>
+            <span className="etiqueta-mono">Casa de Protección Valdocco · reporte del {larga(hoy)}</span>
             <h2 className="subtitulo" style={{ marginTop: 2 }}>{RESPONSABLES[quien]}</h2>
           </div>
           <button type="button" className="btn btn--primario no-imprimir" onClick={() => window.print()}>

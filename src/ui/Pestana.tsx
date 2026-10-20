@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import type { ItemEval, TabEval } from '../dominio/carpeta';
-import { corta, partes } from '../dominio/fechas';
-import { type Marca, type Nino, RESPONSABLES, type Usuario } from '../dominio/modelo';
+import { type ReactNode, useState } from 'react';
+import { FRECUENCIAS_NUTRICION, type FrecuenciaNutricion } from '../dominio/calendario';
+import { type ItemEval, MESES_TALLAJE_REGULAR, type TabEval } from '../dominio/carpeta';
+import { corta, type Fecha, partes } from '../dominio/fechas';
+import { type CasoNutricion, type Marca, type Nino, RESPONSABLES, type Usuario } from '../dominio/modelo';
 import { ahoraISO } from '../datos/repositorio';
 import { Barra, Dialogo, Icono, ICONOS, ICONOS_TAB, useApp } from './comunes';
 
@@ -9,7 +10,6 @@ const ESTADO_PASTILLA: Partial<Record<ItemEval['estado'], [string, string]>> = {
   vencido: ['Vencido', 'pastilla--rojo'],
   pendiente: ['Pendiente', 'pastilla--rojo'],
   cubierto: ['Comodín', 'pastilla--violeta'],
-  exonerado: ['Exonerado', 'pastilla--ambar'],
 };
 
 export function Pestana({ nino, tab, sesion }: { nino: Nino; tab: TabEval; sesion: Usuario }) {
@@ -30,7 +30,7 @@ export function Pestana({ nino, tab, sesion }: { nino: Nino; tab: TabEval; sesio
 
   const docs = tab.items.filter((i) => i.tipo === 'doc' || i.tipo === 'opcional' || (i.tipo === 'programada' && !i.grupo));
   const comodines = tab.items.filter((i) => i.tipo === 'comodin');
-  const excepciones = tab.items.filter((i) => i.tipo === 'excepcion');
+  const interruptores = tab.items.filter((i) => i.tipo === 'interruptor');
   const grupos = [...new Set(tab.items.filter((i) => i.tipo === 'programada' && i.grupo).map((i) => i.grupo!))];
   const marcadoPor = (m?: Marca) => (m ? `Marcado por ${usuario(m.por)?.nombre ?? '—'} · ${corta(m.en.slice(0, 10), hoy)}` : '');
 
@@ -53,6 +53,18 @@ export function Pestana({ nino, tab, sesion }: { nino: Nino; tab: TabEval; sesio
       {tab.id === 'nutricion' && <CasoEspecial nino={nino} />}
       {(tab.id === 'psicologia' || tab.id === 'trabajo_social') && <ResponsableRiesgo nino={nino} tab={tab.id} />}
 
+      {interruptores.map((it) => (
+        <section key={it.id} className="tarjeta tarjeta--pad fila-wrap" style={{ gap: 16 }}>
+          <button type="button" role="switch" aria-checked={!!it.marca} aria-label={it.etiqueta} className="casilla casilla--interruptor" onClick={() => alternar(it)}>
+            {it.marca && <Icono d={ICONOS.check} tam={22} color="#fff" grosor={3} />}
+          </button>
+          <span className="item__texto">
+            <span className="item__nombre">{it.etiqueta}</span>
+            <span className="item__nota">{it.marca ? marcadoPor(it.marca) : it.nota}</span>
+          </span>
+        </section>
+      ))}
+
       {docs.length > 0 && (
         <section className="tarjeta items" aria-label="Documentos">
           {docs.map((it) => {
@@ -63,13 +75,12 @@ export function Pestana({ nino, tab, sesion }: { nino: Nino; tab: TabEval; sesio
                 <button
                   type="button" role="checkbox" aria-checked={!!it.marca} aria-label={it.etiqueta}
                   className={`casilla ${it.estado === 'vencido' && it.marca ? 'casilla--alerta' : ''}`}
-                  disabled={it.estado === 'exonerado'}
                   onClick={() => alternar(it)}
                 >
                   {it.marca && <Icono d={ICONOS.check} tam={22} color="#fff" grosor={3} />}
                 </button>
                 <span className="item__texto">
-                  <span className={`item__nombre ${it.estado === 'exonerado' ? 'item__nombre--tachado' : ''}`}>{it.etiqueta}</span>
+                  <span className="item__nombre">{it.etiqueta}</span>
                   {conFecha && it.fecha && !it.fechaOculta && <span className="item__nota">Fecha: {corta(it.fecha, hoy)}</span>}
                   {it.nota && <span className={`item__nota ${it.estado === 'vencido' ? 'txt-rojo' : ''}`}>{it.nota}</span>}
                   {it.marca && <span className="item__nota">{marcadoPor(it.marca)}{it.marca.anio ? ` · año ${it.marca.anio}` : ''}</span>}
@@ -104,9 +115,10 @@ export function Pestana({ nino, tab, sesion }: { nino: Nino; tab: TabEval; sesio
         </section>
       ))}
 
-      {tab.id === 'pedagogia' && <Vinculaciones nino={nino} />}
+      {tab.id === 'trabajo_social' && <Visitas nino={nino} />}
+      {tab.id === 'academico' && <><Vinculaciones nino={nino} /><Cursos nino={nino} /></>}
 
-      {(comodines.length > 0 || excepciones.length > 0) && (
+      {comodines.length > 0 && (
         <div className="fila-wrap" style={{ alignItems: 'stretch', gap: 16 }}>
           {comodines.length > 0 && (
             <section className="tarjeta tarjeta--pad seccion-comodin" style={{ flex: '1 1 380px', display: 'flex', flexDirection: 'column', gap: 12 }} aria-label="Solicitudes">
@@ -119,22 +131,6 @@ export function Pestana({ nino, tab, sesion }: { nino: Nino; tab: TabEval; sesio
                   <span className="item__texto">
                     <span className="item__nombre">{it.etiqueta}</span>
                     <span className={`item__nota ${it.estado === 'vencido' ? 'txt-rojo' : it.estado === 'ok' ? 'txt-ambar' : ''}`}>{it.nota}</span>
-                  </span>
-                </div>
-              ))}
-            </section>
-          )}
-          {excepciones.length > 0 && (
-            <section className="tarjeta tarjeta--pad" style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: 12 }} aria-label="Excepciones">
-              <span className="etiqueta-mono" style={{ color: 'var(--ambar-tinta)' }}>Excepción</span>
-              {excepciones.map((it) => (
-                <div key={it.id} className="fila-wrap" style={{ flexWrap: 'nowrap' }}>
-                  <button type="button" role="checkbox" aria-checked={!!it.marca} aria-label={it.etiqueta} className="casilla casilla--excepcion" onClick={() => alternar(it)}>
-                    {it.marca && <Icono d={ICONOS.check} tam={22} color="#fff" grosor={3} />}
-                  </button>
-                  <span className="item__texto">
-                    <span className="item__nombre">{it.etiqueta}</span>
-                    <span className="item__nota">{it.nota}</span>
                   </span>
                 </div>
               ))}
@@ -166,7 +162,6 @@ function DialogoDato({ it, bloqueaDesmarcar, onGuardar, onDesmarcar, onCerrar }:
   const { hoy } = useApp();
   const [fecha, setFecha] = useState(it.marca?.fecha ?? hoy);
   const [anio, setAnio] = useState(it.marca?.anio ?? partes(hoy).y);
-  const [texto, setTexto] = useState(it.marca?.texto ?? '');
   const valido = it.pide === 'fecha' ? !!fecha && fecha <= hoy : it.pide === 'anio' ? anio > 2000 : true;
   return (
     <Dialogo titulo={it.etiqueta} onCerrar={onCerrar}>
@@ -178,19 +173,13 @@ function DialogoDato({ it, bloqueaDesmarcar, onGuardar, onDesmarcar, onCerrar }:
       )}
       {it.pide === 'anio' && (
         <label className="campo">
-          Año de la constancia
+          Año de la matrícula
           <input type="number" value={anio} onChange={(e) => setAnio(Number(e.target.value))} />
-        </label>
-      )}
-      {it.pide === 'texto' && (
-        <label className="campo">
-          Motivo
-          <textarea value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Ej.: 13 años, extranjero, no tiene el documento" />
         </label>
       )}
       {it.marca && bloqueaDesmarcar && <p className="txt-ambar" style={{ margin: 0 }}>{bloqueaDesmarcar}</p>}
       <div className="fila-wrap">
-        <button type="button" className="btn btn--primario" disabled={!valido} onClick={() => onGuardar(it.pide === 'fecha' ? { fecha } : it.pide === 'anio' ? { anio } : { texto: texto.trim() })}>
+        <button type="button" className="btn btn--primario" disabled={!valido} onClick={() => onGuardar(it.pide === 'fecha' ? { fecha } : it.pide === 'anio' ? { anio } : {})}>
           {it.marca ? 'Guardar cambios' : 'Marcar'}
         </button>
         {it.marca && <button type="button" className="btn btn--peligro" disabled={!!bloqueaDesmarcar} onClick={onDesmarcar}>Desmarcar</button>}
@@ -200,27 +189,66 @@ function DialogoDato({ it, bloqueaDesmarcar, onGuardar, onDesmarcar, onCerrar }:
   );
 }
 
+const CASO_INICIAL: Omit<CasoNutricion, 'desde'> = { tallajeMeses: 3, atenciones: 'mensual' };
+
 function CasoEspecial({ nino }: { nino: Nino }) {
   const { repo, hoy } = useApp();
-  const activo = !!nino.nutricion;
+  const caso = nino.nutricion;
+  const guardar = (cambios: Partial<CasoNutricion>) => caso && repo.actualizarNino(nino.id, { nutricion: { ...caso, ...cambios } });
   return (
-    <section className="tarjeta tarjeta--pad fila-wrap" style={{ gap: 16 }}>
-      <button
-        type="button" role="switch" aria-checked={activo} aria-label="Caso especial de nutrición"
-        className="casilla casilla--excepcion"
-        onClick={() => repo.actualizarNino(nino.id, { nutricion: activo ? null : { desde: hoy } })}
-      >
-        {activo && <Icono d={ICONOS.check} tam={22} color="#fff" grosor={3} />}
-      </button>
-      <span className="item__texto">
-        <span className="item__nombre">Caso especial (exceso o déficit de peso)</span>
-        <span className="item__nota">
-          {activo
-            ? `Marcado el ${corta(nino.nutricion!.desde, hoy)}: una atención por trimestre desde el plan de caso y tallaje cada 3 meses. Al desactivarlo deja de exigirse todo lo de nutrición.`
-            : 'Al activarlo se exige una atención por trimestre desde el plan de caso.'}
+    <section className="tarjeta tarjeta--pad" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div className="fila-wrap" style={{ gap: 16, flexWrap: 'nowrap' }}>
+        <button
+          type="button" role="switch" aria-checked={!!caso} aria-label="Caso especial de nutrición"
+          className="casilla casilla--interruptor"
+          onClick={() => repo.actualizarNino(nino.id, { nutricion: caso ? null : { desde: hoy, ...CASO_INICIAL } })}
+        >
+          {caso && <Icono d={ICONOS.check} tam={22} color="#fff" grosor={3} />}
+        </button>
+        <span className="item__texto">
+          <span className="item__nombre">Caso especial (exceso o déficit de peso)</span>
+          <span className="item__nota">
+            {caso
+              ? `Marcado el ${corta(caso.desde, hoy)}. Las atenciones se cuentan desde el ingreso. Al desactivarlo deja de exigirse todo lo del caso especial.`
+              : `Peso y talla cada ${MESES_TALLAJE_REGULAR} meses. Al activarlo eliges cada cuánto van el peso y talla y las atenciones.`}
+          </span>
         </span>
-      </span>
+      </div>
+      {caso && (
+        <div className="fila-wrap" style={{ alignItems: 'flex-start', gap: '14px 28px' }}>
+          <Opciones
+            titulo="Peso y talla"
+            valor={caso.tallajeMeses}
+            opciones={[[1, 'Cada mes'], [2, 'Cada 2 meses'], [3, 'Cada 3 meses']]}
+            onCambio={(v) => guardar({ tallajeMeses: v })}
+          />
+          <Opciones
+            titulo="Atenciones"
+            valor={caso.atenciones}
+            opciones={(Object.entries(FRECUENCIAS_NUTRICION) as [FrecuenciaNutricion, string][])}
+            onCambio={(v) => guardar({ atenciones: v })}
+          />
+        </div>
+      )}
     </section>
+  );
+}
+
+function Opciones<T extends string | number>({ titulo, valor, opciones, onCambio }: {
+  titulo: string;
+  valor: T;
+  opciones: [T, string][];
+  onCambio: (v: T) => void;
+}) {
+  return (
+    <div role="group" aria-label={titulo} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <span className="etiqueta-mono">{titulo}</span>
+      <div className="fila-wrap" style={{ gap: 8 }}>
+        {opciones.map(([v, txt]) => (
+          <button key={String(v)} type="button" className="chip" aria-pressed={valor === v} onClick={() => onCambio(v)}>{txt}</button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -247,35 +275,105 @@ function ResponsableRiesgo({ nino, tab }: { nino: Nino; tab: 'psicologia' | 'tra
   );
 }
 
-function Vinculaciones({ nino }: { nino: Nino }) {
-  const { repo, hoy } = useApp();
-  const [nombre, setNombre] = useState('');
-  const [fecha, setFecha] = useState('');
-  const lista = nino.vinculaciones ?? [];
+interface Campo {
+  clave: string;
+  etiqueta: string;
+  tipo?: 'date';
+  requerido?: boolean;
+  ejemplo?: string;
+}
+
+/** Lista libre que no suma al porcentaje: vinculaciones, cursos y solicitudes de visita. */
+function ListaLibre<T extends { id: string }>({ titulo, vacio, lista, campos, mostrar, onGuardar }: {
+  titulo: string;
+  vacio: string;
+  lista: T[];
+  campos: Campo[];
+  mostrar: (x: T) => ReactNode;
+  onGuardar: (lista: T[]) => void;
+}) {
+  const vacioForm = () => Object.fromEntries(campos.map((c) => [c.clave, '']));
+  const [f, setF] = useState<Record<string, string>>(vacioForm);
+  const valido = campos.every((c) => !c.requerido || f[c.clave].trim());
   const agregar = () => {
-    if (!nombre.trim()) return;
-    repo.actualizarNino(nino.id, { vinculaciones: [...lista, { id: String(Date.now()), nombre: nombre.trim(), ...(fecha ? { fecha } : {}) }] });
-    setNombre('');
-    setFecha('');
+    if (!valido) return;
+    const nuevo = Object.fromEntries(campos.filter((c) => f[c.clave].trim()).map((c) => [c.clave, f[c.clave].trim()]));
+    onGuardar([...lista, { id: String(Date.now()), ...nuevo } as unknown as T]);
+    setF(vacioForm());
   };
   return (
-    <section className="tarjeta tarjeta--pad" style={{ display: 'flex', flexDirection: 'column', gap: 12 }} aria-label="Vinculaciones">
+    <section className="tarjeta tarjeta--pad" style={{ display: 'flex', flexDirection: 'column', gap: 12 }} aria-label={titulo}>
       <div className="fila-wrap">
-        <h2 className="subtitulo">Vinculaciones</h2>
-        <span className="pastilla">Opcional · no suma</span>
+        <h2 className="subtitulo">{titulo}</h2>
+        <span className="pastilla">No suma al porcentaje</span>
       </div>
-      {lista.length === 0 && <p className="txt-tenue" style={{ margin: 0 }}>Sin vinculaciones registradas.</p>}
-      {lista.map((v) => (
-        <div key={v.id} className="fila-wrap" style={{ justifyContent: 'space-between', padding: '10px 14px', borderRadius: 14, background: '#f8f9fd' }}>
-          <span><strong>{v.nombre}</strong>{v.fecha && <span className="txt-tenue"> · {corta(v.fecha, hoy)}</span>}</span>
-          <button type="button" className="btn btn--suave" onClick={() => repo.actualizarNino(nino.id, { vinculaciones: lista.filter((x) => x.id !== v.id) })}>Quitar</button>
+      {lista.length === 0 && <p className="txt-tenue" style={{ margin: 0 }}>{vacio}</p>}
+      {lista.map((x) => (
+        <div key={x.id} className="fila-wrap registro">
+          <span>{mostrar(x)}</span>
+          <button type="button" className="btn btn--suave" onClick={() => onGuardar(lista.filter((y) => y.id !== x.id))}>Quitar</button>
         </div>
       ))}
       <div className="fila-wrap" style={{ alignItems: 'flex-end' }}>
-        <label className="campo" style={{ flex: '2 1 220px' }}>Nombre<input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej.: Fútbol, escuela del barrio" /></label>
-        <label className="campo" style={{ flex: '1 1 160px' }}>Fecha (opcional)<input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} /></label>
-        <button type="button" className="btn btn--oscuro" disabled={!nombre.trim()} onClick={agregar}>Agregar</button>
+        {campos.map((c) => (
+          <label key={c.clave} className="campo" style={{ flex: c.tipo === 'date' ? '1 1 160px' : '2 1 200px' }}>
+            {c.etiqueta}{c.requerido ? '' : ' (opcional)'}
+            <input type={c.tipo ?? 'text'} value={f[c.clave]} placeholder={c.ejemplo} onChange={(e) => setF({ ...f, [c.clave]: e.target.value })} />
+          </label>
+        ))}
+        <button type="button" className="btn btn--primario" disabled={!valido} onClick={agregar}>Agregar</button>
       </div>
     </section>
+  );
+}
+
+function Vinculaciones({ nino }: { nino: Nino }) {
+  const { repo, hoy } = useApp();
+  return (
+    <ListaLibre
+      titulo="Vinculaciones"
+      vacio="Sin vinculaciones registradas."
+      lista={nino.vinculaciones ?? []}
+      campos={[{ clave: 'nombre', etiqueta: 'Nombre', requerido: true, ejemplo: 'Ej.: Fútbol, grupo de danza' }, { clave: 'fecha', etiqueta: 'Fecha', tipo: 'date' }]}
+      mostrar={(v) => <><strong>{v.nombre}</strong>{v.fecha && <span className="txt-tenue"> · {corta(v.fecha, hoy)}</span>}</>}
+      onGuardar={(vinculaciones) => repo.actualizarNino(nino.id, { vinculaciones })}
+    />
+  );
+}
+
+function Cursos({ nino }: { nino: Nino }) {
+  const { repo, hoy } = useApp();
+  return (
+    <ListaLibre
+      titulo="Cursos con certificado"
+      vacio="Sin cursos registrados."
+      lista={nino.cursos ?? []}
+      campos={[
+        { clave: 'nombre', etiqueta: 'Curso', requerido: true, ejemplo: 'Ej.: Manipulación de alimentos' },
+        { clave: 'entidad', etiqueta: 'Entidad que certifica', requerido: true, ejemplo: 'Ej.: SENA' },
+        { clave: 'fecha', etiqueta: 'Fecha', tipo: 'date' },
+      ]}
+      mostrar={(c) => <><strong>{c.nombre}</strong><span className="txt-tenue"> · {c.entidad}{c.fecha ? ` · ${corta(c.fecha, hoy)}` : ''}</span></>}
+      onGuardar={(cursos) => repo.actualizarNino(nino.id, { cursos })}
+    />
+  );
+}
+
+function Visitas({ nino }: { nino: Nino }) {
+  const { repo, hoy } = useApp();
+  const orden = (xs: { fecha: Fecha }[]) => [...xs].sort((a, b) => a.fecha.localeCompare(b.fecha));
+  return (
+    <ListaLibre
+      titulo="Solicitudes de visita"
+      vacio="Sin solicitudes de visita registradas."
+      lista={orden(nino.visitas ?? []) as NonNullable<Nino['visitas']>}
+      campos={[
+        { clave: 'fecha', etiqueta: 'Fecha', tipo: 'date', requerido: true },
+        { clave: 'persona', etiqueta: 'Persona', requerido: true, ejemplo: 'Ej.: Juanita Pérez' },
+        { clave: 'parentesco', etiqueta: 'Parentesco', ejemplo: 'Ej.: tía' },
+      ]}
+      mostrar={(v) => <><strong>Solicitud de visita · {v.persona}</strong><span className="txt-tenue">{v.parentesco ? ` (${v.parentesco})` : ''} · {corta(v.fecha, hoy)}</span></>}
+      onGuardar={(visitas) => repo.actualizarNino(nino.id, { visitas })}
+    />
   );
 }

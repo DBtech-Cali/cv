@@ -59,7 +59,7 @@ export function agenda(ninos: Nino[], hoy: Fecha): Evento[] {
     }
     const fuera = diasFuera(n, hoy);
     if (fuera !== null && fuera > DIAS_ALERTA_PRESTAMO) {
-      out.push({ ninoId: n.id, nino: nombre, tab: 'inicio', que: `Carpeta fuera hace ${fuera} días`, fecha: n.prestamo!.desde.slice(0, 10), urgencia: 'vencido', responsable: 'general' });
+      out.push({ ninoId: n.id, nino: nombre, tab: 'inicial', que: `Carpeta fuera hace ${fuera} días`, fecha: n.prestamo!.desde.slice(0, 10), urgencia: 'vencido', responsable: 'general' });
     }
   }
   return out.sort((a, b) => a.fecha.localeCompare(b.fecha) || a.nino.localeCompare(b.nino, 'es'));
@@ -89,9 +89,10 @@ export interface ItemCatalogo {
   tabNombre: string;
 }
 
+// Con traslado marcado, para que el catálogo incluya también sus documentos.
 const NINO_MODELO: Nino = {
-  id: 'modelo', nombres: '', primerApellido: '', fechaIngreso: '2000-01-01', caja: 0, activo: true, marcas: {},
-  responsableRiesgo: 'psicologia', nutricion: null,
+  id: 'modelo', nombres: '', primerApellido: '', fechaIngreso: '2000-01-01', caja: 0, activo: true,
+  marcas: { 'socio.traslado': { por: '', en: '' } }, responsableRiesgo: 'psicologia', nutricion: null,
 };
 
 export function catalogoItems(hoy: Fecha): ItemCatalogo[] {
@@ -99,14 +100,14 @@ export function catalogoItems(hoy: Fecha): ItemCatalogo[] {
   for (const tab of evaluarCarpeta(NINO_MODELO, hoy).tabs) {
     for (const it of tab.items) {
       const documento = it.tipo === 'doc' || it.tipo === 'opcional';
-      const fijo = it.tipo === 'programada' && !it.grupo && !/_\d+$/.test(it.id); // sin seguimientos numerados
+      const fijo = it.tipo === 'programada' && !it.grupo && !it.id.startsWith('ate.') && !/_\d+$/.test(it.id); // sin atenciones ni seguimientos numerados
       if (documento || fijo) out.push({ id: it.id, etiqueta: it.etiqueta, tab: tab.id, tabNombre: tab.nombre });
     }
   }
   return out;
 }
 
-export type EstadoReporte = 'falta' | 'vencido' | 'cubierto' | 'exonerado' | 'al_dia' | 'no_aplica';
+export type EstadoReporte = 'falta' | 'vencido' | 'cubierto' | 'al_dia' | 'no_aplica';
 
 export interface FilaReporteItem {
   ninoId: string;
@@ -127,8 +128,7 @@ export function reportePorItem(ninos: Nino[], hoy: Fecha, itemId: string): FilaR
       continue;
     }
     const estado: EstadoReporte =
-      it.estado === 'exonerado' ? 'exonerado'
-      : it.estado === 'cubierto' ? 'cubierto'
+      it.estado === 'cubierto' ? 'cubierto'
       : it.estado === 'vencido' ? 'vencido'
       : it.estado === 'pendiente' ? 'falta'
       : it.marca ? 'al_dia'

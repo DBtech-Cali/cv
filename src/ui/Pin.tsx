@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Usuario } from '../dominio/modelo';
-import { Brote, useApp } from './comunes';
+import { Estrella, useApp } from './comunes';
 
 /** Teclado de PIN. Identifica a la persona por su PIN (único). */
 export function Pin({ contexto, titulo, onOk, onCancelar, validar }: {
@@ -34,7 +34,7 @@ export function Pin({ contexto, titulo, onOk, onCancelar, validar }: {
   return (
     <div className="pin-fondo">
       <section className="pin" aria-labelledby="pin-titulo">
-        <Brote tam={72} />
+        <Estrella tam={72} />
         <div>
           <span className="etiqueta-mono">{contexto}</span>
           <h1 id="pin-titulo" className="titulo" style={{ fontSize: 28, marginTop: 4 }}>{titulo}</h1>

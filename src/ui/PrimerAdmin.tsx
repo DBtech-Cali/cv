@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { type Cargo, CARGOS } from '../dominio/modelo';
-import { Brote, useApp } from './comunes';
+import { Estrella, useApp } from './comunes';
 
 /** Primera vez con Firebase: no hay usuarios, se crea el primer administrador. */
 export function PrimerAdmin() {
@@ -22,7 +22,7 @@ export function PrimerAdmin() {
   return (
     <div className="pin-fondo">
       <section className="pin" aria-labelledby="primer-titulo" style={{ maxWidth: 460 }}>
-        <Brote tam={72} feliz />
+        <Estrella tam={72} feliz />
         <div>
           <span className="etiqueta-mono">Primera vez</span>
           <h1 id="primer-titulo" className="titulo" style={{ fontSize: 28, marginTop: 4 }}>Crea el primer administrador</h1>

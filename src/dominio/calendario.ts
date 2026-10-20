@@ -1,13 +1,20 @@
-// Calendario de atención de Semillas Salesianas. Ver docs/reglas-atencion.md.
-import { Fecha, partes, sumarDias, sumarMeses } from './fechas';
-
-export type AreaAtencion = 'trabajo_social' | 'psicologia' | 'pedagogia';
+// Calendario de atención de la Casa de Protección. Ver docs/reglas-atencion.md.
+import { type Fecha, partes, sumarDias, sumarMeses } from './fechas';
 
 export interface Programada {
   id: string;
   fecha: Fecha;
   etiqueta: string;
+  grupo?: string;
 }
+
+export type FrecuenciaNutricion = 'quincenal' | 'mensual' | 'trimestral';
+
+export const FRECUENCIAS_NUTRICION: Record<FrecuenciaNutricion, string> = {
+  quincenal: '2 al mes',
+  mensual: '1 al mes',
+  trimestral: '1 al trimestre',
+};
 
 export function planDeCaso(ingreso: Fecha): Fecha {
   return sumarMeses(ingreso, 1);
@@ -30,29 +37,72 @@ export function bloqueDe(ingreso: Fecha, f: Fecha): number {
   return k;
 }
 
-/** Atenciones de un área hasta la fecha límite (inclusive). */
-export function atenciones(ingreso: Fecha, hasta: Fecha): Programada[] {
-  const plan = planDeCaso(ingreso);
-  const ancla = partes(plan).d;
-  const fechas: Fecha[] = [
-    sumarDias(plan, 15),
-    sumarMeses(plan, 1, ancla),
-    sumarDias(sumarMeses(plan, 1, ancla), 15),
-    sumarMeses(plan, 2, ancla),
-    sumarDias(sumarMeses(plan, 2, ancla), 15),
-  ];
-  const seg1 = hito(ingreso, 1);
-  fechas.push(sumarMeses(seg1, 1, ancla), sumarMeses(seg1, 2, ancla), sumarDias(hito(ingreso, 2), -5));
+/** Atenciones de ingreso de Psicología, en orden. Las de Trabajo social no tienen nombre. */
+export const ATENCIONES_INGRESO_PSICOLOGIA = [
+  'Valoración de consumo',
+  'Estado físico',
+  'Adaptación',
+  'Seguimiento a la adaptación',
+  'Gustos y preferencias',
+  'Estado emocional',
+];
+
+/**
+ * Trabajo social y Psicología desde el 1er seguimiento: 3 por bloque trimestral,
+ * a 1 y 2 meses del seguimiento que lo abre y 5 días antes del siguiente.
+ * Se numeran desde la 7 (las 6 primeras son las de ingreso, sin fecha).
+ */
+export function atencionesPorBloque(ingreso: Fecha, hasta: Fecha): Programada[] {
+  const ancla = partes(planDeCaso(ingreso)).d;
   const out: Programada[] = [];
-  fechas.forEach((fecha, i) => {
-    if (fecha <= hasta) out.push({ id: String(i + 1), fecha, etiqueta: `Atención ${i + 1}` });
-  });
-  for (let k = 2, n = 9; ; k++, n++) {
-    const fecha = sumarDias(hito(ingreso, k), 45);
-    if (fecha > hasta) break;
-    out.push({ id: String(n), fecha, etiqueta: `Atención ${n}` });
+  for (let k = 1, n = 7; ; k++) {
+    const abre = hito(ingreso, k);
+    if (abre > hasta) break;
+    const grupo = `Bloque ${k} · ${k}º → ${k + 1}º seguimiento`;
+    for (const fecha of [sumarMeses(abre, 1, ancla), sumarMeses(abre, 2, ancla), sumarDias(hito(ingreso, k + 1), -5)]) {
+      if (fecha <= hasta) out.push({ id: String(n), fecha, etiqueta: `Atención ${n}`, grupo });
+      n++;
+    }
   }
   return out;
+}
+
+const grupoAnual = (f: Fecha) => `Atenciones ${partes(f).y}`;
+
+/**
+ * Académico: mensuales en el día del ingreso. Si ingresa hasta el día 15, la primera es
+ * a los 15 días; si ingresa del 16 en adelante, ese mes no tiene atención.
+ */
+export function atencionesAcademico(ingreso: Fecha, hasta: Fecha): Programada[] {
+  const fechas: Fecha[] = partes(ingreso).d <= 15 ? [sumarDias(ingreso, 15)] : [];
+  for (let m = 1; ; m++) {
+    const f = sumarMeses(ingreso, m);
+    if (f > hasta) break;
+    fechas.push(f);
+  }
+  return fechas
+    .filter((f) => f <= hasta)
+    .map((fecha, i) => ({ id: String(i + 1), fecha, etiqueta: `Atención ${i + 1}`, grupo: grupoAnual(fecha) }));
+}
+
+/**
+ * Nutrición en caso especial, desde el día del ingreso y con la frecuencia elegida.
+ * El id es la fecha: si cambia la frecuencia, las atenciones que coinciden conservan su marca.
+ */
+export function atencionesNutricion(ingreso: Fecha, frecuencia: FrecuenciaNutricion, hasta: Fecha): Programada[] {
+  const fechas: Fecha[] = [];
+  for (let m = 0; ; m++) {
+    if (frecuencia === 'quincenal') {
+      const media = sumarDias(sumarMeses(ingreso, m), 15);
+      if (media > hasta) break;
+      fechas.push(media);
+    }
+    const paso = frecuencia === 'trimestral' ? 3 * (m + 1) : m + 1;
+    const f = sumarMeses(ingreso, paso);
+    if (f > hasta) break;
+    fechas.push(f);
+  }
+  return fechas.map((fecha, i) => ({ id: fecha, fecha, etiqueta: `Atención de Nutrición ${i + 1}`, grupo: grupoAnual(fecha) }));
 }
 
 /** Seguimientos de nivel de riesgo: mensuales desde el plan de caso. */
@@ -67,28 +117,12 @@ export function nivelRiesgo(ingreso: Fecha, hasta: Fecha): Programada[] {
   return out;
 }
 
-/**
- * Atenciones de Nutrición para un caso especial activado en `desde`: una por bloque,
- * a los 45 días del hito que lo abre, empezando por el bloque donde se activó.
- * Si se activó después de esa fecha, el límite de la primera es el hito que cierra el bloque.
- */
-export function atencionesNutricion(ingreso: Fecha, desde: Fecha, hasta: Fecha): Programada[] {
-  const primero = bloqueDe(ingreso, desde);
-  const out: Programada[] = [];
-  for (let k = primero; ; k++) {
-    let fecha = sumarDias(hito(ingreso, k), 45);
-    if (k === primero && desde > fecha) fecha = hito(ingreso, k + 1);
-    if (fecha > hasta) break;
-    out.push({ id: `b${k}`, fecha, etiqueta: `Atención de Nutrición · bloque ${k + 1}` });
-  }
-  return out;
-}
-
 /** Ítems de la pestaña Informes con su fecha de exigencia. */
 export function informes(ingreso: Fecha, hasta: Fecha): Programada[] {
   const integradora = sumarDias(ingreso, 22);
   const plan = planDeCaso(ingreso);
   const out: Programada[] = [
+    { id: 'preliminar', fecha: sumarDias(ingreso, 5), etiqueta: 'Evaluación preliminar' },
     { id: 'eval_integradora', fecha: integradora, etiqueta: 'Evaluación integradora' },
     { id: 'acta_integradora', fecha: integradora, etiqueta: 'Acta de caso de la evaluación integradora' },
     { id: 'plan', fecha: plan, etiqueta: 'Plan de caso' },

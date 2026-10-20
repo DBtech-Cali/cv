@@ -55,19 +55,25 @@ export function Barra({ pct, gruesa, etiqueta }: { pct: number | null; gruesa?: 
   );
 }
 
-export function Brote({ tam = 44, feliz }: { tam?: number; feliz?: boolean }) {
+/** Avatar de la app: una estrella que celebra (ojos cerrados, sonrisa y destellos) cuando algo llega al 100 %. */
+export function Estrella({ tam = 44, feliz }: { tam?: number; feliz?: boolean }) {
   return (
     <svg width={tam} height={tam} viewBox="0 0 48 48" fill="none" aria-hidden="true">
-      <path d="M24 11c0-5 4-9 10-9 0 5-4 9-10 9z" fill="#2BB673" />
-      <path d="M24 11v6" stroke="#16163A" strokeWidth="2.5" strokeLinecap="round" />
-      <rect x="7" y="17" width="34" height="27" rx="12" fill="#4338CA" />
-      <rect x="12" y="23" width="24" height="14" rx="7" fill="#E9E7FF" />
+      <path
+        d="M24 7 L29.1 19.3 L42.2 20.3 L32.2 28.9 L35.3 41.6 L24 34.6 L12.7 41.6 L15.8 28.9 L5.8 20.3 L18.9 19.3 Z"
+        fill="#FF9F1C" stroke="#FF9F1C" strokeWidth="4" strokeLinejoin="round"
+      />
+      <circle cx="17.5" cy="29" r="1.9" fill="#FF5D73" opacity=".75" />
+      <circle cx="30.5" cy="29" r="1.9" fill="#FF5D73" opacity=".75" />
       {feliz ? (
-        <path d="M16 30.5l3-3 3 3M26 30.5l3-3 3 3" stroke="#16163A" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        <>
+          <path d="M18 26l2-2 2 2M26 26l2-2 2 2M21.5 29.5q2.5 2 5 0" stroke="#12343B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M42 4l1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1zM6 36l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" fill="#0E9F9A" />
+        </>
       ) : (
         <>
-          <circle cx="19" cy="30" r="2.6" fill="#16163A" />
-          <circle cx="29" cy="30" r="2.6" fill="#16163A" />
+          <circle cx="20.5" cy="25.5" r="2.2" fill="#12343B" />
+          <circle cx="27.5" cy="25.5" r="2.2" fill="#12343B" />
         </>
       )}
     </svg>
@@ -94,19 +100,25 @@ export const ICONOS = {
   escudo: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
 };
 
+const TONOS = {
+  turquesa: { fondo: '#DDF5F3', tinta: '#0B7C78' },
+  cielo: { fondo: '#E1EFFF', tinta: '#2563B0' },
+  mango: { fondo: '#FFF0D6', tinta: '#A35A00' },
+  coral: { fondo: '#FFE3E7', tinta: '#C4304A' },
+  lila: { fondo: '#EFE9FF', tinta: '#6246C9' },
+  lima: { fondo: '#EAF7D7', tinta: '#4B7A12' },
+};
+
 export const ICONOS_TAB: Record<TabId, { d: string; fondo: string; tinta: string }> = {
-  inicio: { d: 'M5 21V4M5 4h11l-2 4 2 4H5', fondo: '#EEECFF', tinta: '#4338CA' },
-  preliminar: { d: 'M9 3h6v3H9zM7 4.5H5V21h14V4.5h-2M9 12h6M9 16h4', fondo: '#DDF6EF', tinta: '#0F7A5C' },
-  pacto: { d: 'M4 20l4-1 11-11-3-3L5 16zM14 6l3 3', fondo: '#FFE8DA', tinta: '#B4501E' },
-  socio_legal: { d: 'M3 6h18v12H3zM7 10h4M7 14h6M15 10h3v4h-3z', fondo: '#E0F0FF', tinta: '#1D5FA8' },
-  informes: { d: 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7', fondo: '#FFF4CC', tinta: '#8A6400' },
-  salud: { d: 'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z', fondo: '#FCE4F1', tinta: '#A1306E' },
-  nutricion: { d: 'M12 7c-3-2-7 0-7 5s3 9 5 9c1 0 1.5-.5 2-.5s1 .5 2 .5c2 0 5-4 5-9s-4-7-7-5zM12 7c0-2 1-4 3-4', fondo: '#DDF6EF', tinta: '#0F7A5C' },
-  trabajo_social: { d: 'M3 11l9-7 9 7M5 10v10h14V10M10 20v-5h4v5', fondo: '#E0F0FF', tinta: '#1D5FA8' },
-  psicologia: { d: 'M4 5h16v11H9l-5 4z', fondo: '#EEECFF', tinta: '#4338CA' },
-  escuela: { d: 'M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19V5', fondo: '#FFF4CC', tinta: '#8A6400' },
-  pedagogia: { d: 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5l-5.4 3 1.2-6-4.5-4.2 6.1-.7z', fondo: '#FFE8DA', tinta: '#B4501E' },
-  proyecto_vida: { d: 'M12 21v-9M12 12c0-4 3-7 8-7 0 4-3 7-8 7zM12 14c0-3-2-5-6-5 0 3 2 5 6 5z', fondo: '#FCE4F1', tinta: '#A1306E' },
+  inicial: { d: 'M5 21V4M5 4h11l-2 4 2 4H5', ...TONOS.turquesa },
+  socio_legal: { d: 'M3 6h18v12H3zM7 10h4M7 14h6M15 10h3v4h-3z', ...TONOS.cielo },
+  informes: { d: 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7', ...TONOS.mango },
+  trabajo_social: { d: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 5.5a3 3 0 0 1 0 5.5M18 14c2 .7 3 2.8 3 6', ...TONOS.coral },
+  psicologia: { d: 'M4 5h16v11H9l-5 4z', ...TONOS.lila },
+  historia_medica: { d: 'M9.5 3h5v6.5H21v5h-6.5V21h-5v-6.5H3v-5h6.5z', ...TONOS.turquesa },
+  nutricion: { d: 'M12 7c-3-2-7 0-7 5s3 9 5 9c1 0 1.5-.5 2-.5s1 .5 2 .5c2 0 5-4 5-9s-4-7-7-5zM12 7c0-2 1-4 3-4', ...TONOS.lima },
+  academico: { d: 'M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19V5', ...TONOS.mango },
+  proyecto_vida: { d: 'M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zM15.5 8.5l-2 5-5 2 2-5z', ...TONOS.cielo },
 };
 
 export function Encabezado({ activa }: { activa: 'carpetas' | 'agenda' | 'admin' }) {
@@ -116,10 +128,10 @@ export function Encabezado({ activa }: { activa: 'carpetas' | 'agenda' | 'admin'
     <header className="barra-sup no-imprimir">
       <div className="barra-sup__in">
         <a className="marca" href="#/">
-          <Brote />
+          <Estrella />
           <span>
-            <span className="marca__nombre">Semillas Salesianas</span>
-            <span className="etiqueta-mono">Revisor de carpetas</span>
+            <span className="marca__nombre">Casa de Protección</span>
+            <span className="etiqueta-mono">Valdocco</span>
           </span>
         </a>
         <nav className="nav" aria-label="Secciones">

@@ -7,7 +7,7 @@ import type { Datos, Repositorio } from './datos/repositorio';
 import { Admin } from './ui/Admin';
 import { Agenda } from './ui/Agenda';
 import { Carpeta } from './ui/Carpeta';
-import { Brote, Ctx, ir, useRuta } from './ui/comunes';
+import { Estrella, Ctx, ir, useRuta } from './ui/comunes';
 import { Lista } from './ui/Lista';
 import { Pin } from './ui/Pin';
 import { PrimerAdmin } from './ui/PrimerAdmin';
@@ -49,7 +49,7 @@ export function App({ repo }: { repo: Repositorio }) {
   if (!ctx) {
     return (
       <div className="pin-fondo">
-        <div className="pin"><Brote tam={72} /><p>Cargando carpetas…</p></div>
+        <div className="pin"><Estrella tam={72} /><p>Cargando carpetas…</p></div>
       </div>
     );
   }
@@ -78,7 +78,7 @@ export function App({ repo }: { repo: Repositorio }) {
     <Ctx.Provider value={ctx}>
       {repo.modo === 'demo' && (
         <div className="aviso-demo no-imprimir">
-          Modo demostración: los datos se guardan solo en este navegador. PIN de prueba: 1111 Psicóloga · 2222 TS · 3333 Nutrición · 4444 Pedagoga · 9999 Coordinador.{' '}
+          Modo demostración: los datos se guardan solo en este navegador. PIN de prueba: 1111 Psicóloga · 2222 TS · 3333 Nutrición · 4444 Pedagogo · 9999 Coordinador · 8888 Gestor de caso.{' '}
           <button type="button" onClick={() => { reiniciarDemo(); window.location.reload(); }}>Reiniciar datos</button>
         </div>
       )}
